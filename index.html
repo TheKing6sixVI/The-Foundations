@@ -302,13 +302,13 @@ function updateClockUI() {
   const sl = el('btn-sleep'); if (sl) sl.disabled = busy();
 }
 let debugOpen = false;
-let debugSnapshot = null;
+let debugSnapshot = null; let debugFast = false;
 const DEBUG_WORD = 'Joy';
 function tick() {
   if (state.timeMode === 'turn') return;
   const prevTotal = nowTotal();
-  state.clock.secs = (state.clock.secs || 0) + 10;
-  if (state.clock.secs >= 60) { state.clock.secs -= 60; state.clock.minutes += 1; if (state.clock.minutes % 60 === 0 && state.stamina !== undefined && state.stamina < (state.maxStamina || 100)) state.stamina = Math.min(state.maxStamina || 100, state.stamina + 5); }
+  state.clock.secs = (state.clock.secs || 0) + (debugFast ? 100 : 10);
+  if (state.clock.secs >= 60) { const minsBefore = state.clock.minutes; while (state.clock.secs >= 60) { state.clock.secs -= 60; state.clock.minutes += 1; } if (state.stamina !== undefined && state.stamina < (state.maxStamina || 100)) { const crossed = Math.floor(state.clock.minutes / 60) - Math.floor(minsBefore / 60); if (crossed > 0) state.stamina = Math.min(state.maxStamina || 100, state.stamina + crossed * 5); } }
   if (state.clock.minutes >= 1440) {
     state.clock.minutes -= 1440; state.clock.day += 1;
     onNewDay(); checkMissions(); render();
@@ -543,6 +543,7 @@ function bindModalButtons() {
   body.querySelectorAll('[data-debug-day]').forEach(function (b) { b.onclick = debugSetDay; });
   body.querySelectorAll('[data-debug-night]').forEach(function (b) { b.onclick = debugSetNight; });
   body.querySelectorAll('[data-debug-morning]').forEach(function (b) { b.onclick = debugSetMorning; });
+  body.querySelectorAll('[data-debug-fast]').forEach(function (b) { b.onclick = debugToggleFast; });
   body.querySelectorAll('[data-debug-restore]').forEach(function (b) { b.onclick = debugRestore; });
   body.querySelectorAll('[data-debug-keep]').forEach(function (b) { b.onclick = debugKeep; });
   body.querySelectorAll('[data-party-auto]').forEach(function (b) { b.onclick = function () { state.partyWeapons = autoPartyWeapons(state.partySize); render(); openPeople(); }; });
@@ -2236,6 +2237,7 @@ function openDebugPanel() {
   html += '<div class="row"><span>Resources (each)</span><span><input id="debug-res-amount" type="number" value="1000" style="width:100px"> <button data-debug-res="1">Give all resources</button></span></div>';
   html += '<h3 style="margin:14px 0 4px">Time</h3><div class="row"><span>Day</span><span><input id="debug-day" type="number" value="' + state.clock.day + '" style="width:100px"> <button data-debug-day="1">Set day</button></span></div>';
   html += '<div class="row"><span>Clock</span><span><button data-debug-night="1">Set to night (22:00)</button> <button data-debug-morning="1">Set to morning (06:00)</button></span></div>';
+  html += '<div class="row"><span>Fast clock</span><span><button class="choice' + (debugFast ? ' chosen' : '') + '" data-debug-fast="1">⏩ Fast time: ' + (debugFast ? 'ON (10×)' : 'OFF') + '</button></span></div>';
   html += '<h3 style="margin:14px 0 4px">Exit debug</h3><div class="row"><span></span><span><button data-debug-restore="1">Restore my game</button> <button data-debug-keep="1">Keep changes</button></span></div>';
   openModal('🔧 Owner Debug', 'Your real game is untouched unless you press Keep changes.', html);
   bindModalButtons();
@@ -2271,14 +2273,15 @@ function debugSetDay() {
 }
 function debugSetNight() { state.clock.minutes = 22 * 60; state.clock.secs = 0; event('Clock set to night (22:00).'); render(); openDebugPanel(); }
 function debugSetMorning() { state.clock.minutes = 6 * 60; state.clock.secs = 0; event('Clock set to morning (06:00).'); render(); openDebugPanel(); }
+function debugToggleFast() { debugFast = !debugFast; event(debugFast ? 'Fast time ON — the clock runs 10× faster.' : 'Fast time OFF — the clock is back to normal.'); openDebugPanel(); }
 function debugRestore() {
   debugSnapshotRestore();
-  debugSnapshot = null; debugOpen = false;
+  debugSnapshot = null; debugOpen = false; debugFast = false;
   closeModal(); render();
   event('Debug closed — your game is exactly as it was.');
 }
 function debugKeep() {
-  debugSnapshot = null; debugOpen = false;
+  debugSnapshot = null; debugOpen = false; debugFast = false;
   closeModal(); render();
   event('Debug closed — changes kept and will save normally.');
 }
