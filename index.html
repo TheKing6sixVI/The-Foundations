@@ -257,14 +257,60 @@ function setPartyWeapon(slot, value) {
   ensurePartyWeapons();
   render(); openPeople();
 }
-const RESEARCH = {
-  tools: { name: 'Better Tools', desc: '+2 to all gathering', cost: { wood: 30, iron: 20, khan: 60 } },
-  farming: { name: 'Better Farming', desc: 'Farms yield +3 food', cost: { wood: 20, food: 30, khan: 50 } },
-  buildings: { name: 'Stronger Buildings', desc: '+2 housing per building', cost: { stone: 40, steel: 20, khan: 100 } },
-  weapons: { name: 'Weapon Training', desc: '+4 fight damage', cost: { iron: 40, steel: 20, khan: 120 } },
-  forges: { name: 'Hotter Forges', desc: 'Smelting gives +1 steel', cost: { iron: 30, copper: 30, khan: 100 } },
-  networks: { name: 'Trade Networks', desc: 'Sell +1 khan, buy −1 khan', cost: { khan: 150, copper: 20 } },
-};
+const RANK_RESEARCH = [
+  [
+    { key: 'tools', name: 'Better Tools', desc: '+2 to all gathering', cost: { wood: 30, iron: 20, khan: 60 }, bonus: { gather: 2 } },
+    { key: 'gardens', name: 'Kitchen Gardens', desc: '+2 farm food', cost: { wood: 20, food: 20, khan: 50 }, bonus: { farm: 2 } },
+  ],
+  [
+    { key: 'farming', name: 'Better Farming', desc: 'Farms yield +3 food', cost: { wood: 20, food: 30, khan: 50 }, bonus: { farm: 3 } },
+    { key: 'huts', name: 'Sturdy Huts', desc: '+1 housing per building', cost: { wood: 40, stone: 20, khan: 80 }, bonus: { housing: 1 } },
+  ],
+  [
+    { key: 'buildings', name: 'Stronger Buildings', desc: '+2 housing per building', cost: { stone: 40, steel: 20, khan: 100 }, bonus: { housing: 2 } },
+    { key: 'militia', name: 'Village Militia', desc: '+2 fight damage', cost: { iron: 30, wood: 20, khan: 90 }, bonus: { damage: 2 } },
+  ],
+  [
+    { key: 'markets', name: 'Town Markets', desc: 'Sell +1 khan', cost: { khan: 120, wood: 30 }, bonus: { sell: 1 } },
+    { key: 'granaries', name: 'Town Granaries', desc: 'Farms yield +3 food', cost: { wood: 40, food: 40, khan: 120 }, bonus: { farm: 3 } },
+  ],
+  [
+    { key: 'networks', name: 'Trade Networks', desc: 'Sell +1 khan, buy \u22121 khan', cost: { khan: 150, copper: 20 }, bonus: { sell: 1, buy: 1 } },
+    { key: 'guilds', name: 'Merchant Guilds', desc: 'Sell +2 khan', cost: { khan: 200, copper: 30 }, bonus: { sell: 2 } },
+  ],
+  [
+    { key: 'weapons', name: 'Weapon Training', desc: '+4 fight damage', cost: { iron: 40, steel: 20, khan: 120 }, bonus: { damage: 4 } },
+    { key: 'arsenal', name: "Knight's Arsenal", desc: '+2 fight damage', cost: { iron: 50, steel: 30, khan: 150 }, bonus: { damage: 2 } },
+  ],
+  [
+    { key: 'forges', name: 'Hotter Forges', desc: 'Smelting gives +1 steel', cost: { iron: 30, copper: 30, khan: 100 }, bonus: { steel: 1 } },
+    { key: 'keep', name: "Lord's Keep", desc: '+2 housing per building', cost: { stone: 80, steel: 20, khan: 200 }, bonus: { housing: 2 } },
+  ],
+  [
+    { key: 'kinggranaries', name: 'Royal Granaries', desc: 'Farms yield +4 food', cost: { wood: 50, food: 50, khan: 250 }, bonus: { farm: 4 } },
+    { key: 'kingroads', name: "King's Roads", desc: 'Sell +2 khan', cost: { stone: 60, khan: 300 }, bonus: { sell: 2 } },
+  ],
+  [
+    { key: 'court', name: "High King's Court", desc: '+4 to all gathering', cost: { wood: 80, stone: 80, khan: 400 }, bonus: { gather: 4 } },
+    { key: 'treasury', name: "High King's Treasury", desc: 'Sell +2 khan, buy \u22121 khan', cost: { khan: 500, copper: 50 }, bonus: { sell: 2, buy: 1 } },
+  ],
+  [
+    { key: 'impforges', name: 'Imperial Forges', desc: 'Smelting gives +2 steel', cost: { iron: 80, copper: 80, khan: 500 }, bonus: { steel: 2 } },
+    { key: 'legions', name: 'Imperial Legions', desc: '+6 fight damage', cost: { iron: 100, steel: 40, khan: 600 }, bonus: { damage: 6 } },
+  ],
+  [
+    { key: 'works', name: 'Grand Public Works', desc: '+3 housing per building', cost: { stone: 150, steel: 50, khan: 700 }, bonus: { housing: 3 } },
+    { key: 'grandtrade', name: 'Grand Trade Empire', desc: 'Sell +3 khan, buy \u22122 khan', cost: { khan: 800, copper: 80 }, bonus: { sell: 3, buy: 2 } },
+  ],
+  [
+    { key: 'harvest', name: 'Eternal Harvest', desc: 'Farms yield +6 food', cost: { food: 150, wood: 100, khan: 900 }, bonus: { farm: 6 } },
+    { key: 'might', name: 'Eternal Might', desc: '+8 fight damage, +4 to all gathering', cost: { iron: 150, steel: 80, khan: 1000, mithril: 10 }, bonus: { damage: 8, gather: 4 } },
+  ],
+];
+function rankResearchByKey(key) { for (let r = 0; r < RANK_RESEARCH.length; r++) { for (let i = 0; i < RANK_RESEARCH[r].length; i++) { if (RANK_RESEARCH[r][i].key === key) return { rank: r, item: RANK_RESEARCH[r][i] }; } } return null; }
+// Old items (tools, farming, buildings, weapons, forges, networks) keep their hardcoded bonuses; rankBonus covers only the new rank items, so nothing double-counts.
+function rankBonus(s, channel) { if (!s || !s.research) return 0; const OLD = { tools: 1, farming: 1, buildings: 1, weapons: 1, forges: 1, networks: 1 }; let t = 0; RANK_RESEARCH.forEach(function (list) { list.forEach(function (it) { if (s.research[it.key] && it.bonus[channel] && !OLD[it.key]) t += it.bonus[channel]; }); }); return t; }
+function totalRankResearch() { return RANK_RESEARCH.reduce(function (n, list) { return n + list.length; }, 0); }
 function totalDungeons() { return Object.keys(DUNGEON_POOLS).reduce(function (n, k) { return n + DUNGEON_POOLS[k].length; }, 0); }
 function makeSettlement(id, name, race, desc, startBuildings) {
   const cap = startBuildings.reduce(function (t, b) { return t + BUILDINGS[b].cap; }, 0);
@@ -295,7 +341,7 @@ const state = {
   regions: { crystal: makeRegionState('crystal'), ashen: makeRegionState('ashen'), northreach: makeRegionState('northreach'), ravenholt: makeRegionState('ravenholt'), elderwood: makeRegionState('elderwood'), ironhold: makeRegionState('ironhold'), spires: makeRegionState('spires'), emberpeak: makeRegionState('emberpeak'), fangmire: makeRegionState('fangmire') }
 };
 function cur() { return settlements[state.current]; }
-function capacity(s) { return s.buildings.reduce(function (t, b) { return t + BUILDINGS[b].cap + (s.research && s.research.buildings ? 2 : 0); }, 0); }
+function capacity(s) { return s.buildings.reduce(function (t, b) { return t + BUILDINGS[b].cap + (s.research && s.research.buildings ? 2 : 0) + rankBonus(s, 'housing'); }, 0); }
 function adults(s) { return Math.max(0, s.pop - s.children - s.elderly); }
 function season() { const seasons = ['Spring', 'Summer', 'Autumn', 'Winter']; return seasons[Math.floor((state.clock.day - 1) / 10) % 4]; }
 function year() { return 1 + Math.floor((state.clock.day - 1) / 40); }
@@ -317,7 +363,8 @@ function updateClockUI() {
   const sl = el('btn-sleep'); if (sl) sl.disabled = busy();
 }
 let debugOpen = false;
-let debugSnapshot = null; let debugFast = false;
+let debugSnapshot = null; let debugFast = false; let debugGuest = false;
+const DEBUG_WORD_GUEST = 'GRM-SniperRifle_14';
 const DEBUG_WORD = 'Joy';
 function tick() {
   if (state.timeMode === 'turn') return;
@@ -661,19 +708,19 @@ function render() {
   if (s.buildings.length > 14) { houses += ' +' + (s.buildings.length - 14) + ' more'; }
   setText('local-scene', houses + ' 🌲🌾🛣️');
   setText('local-surroundings', 'Surroundings: ' + RACES[s.race].scene);
-  const woodAmt = 10 + (state.playerRace === 'veyari' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0);
+  const woodAmt = 10 + (state.playerRace === 'veyari' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0) + rankBonus(s, 'gather');
   const gw = el('g-wood'); if (gw) gw.textContent = '🌲 Forest — Wood +' + woodAmt + ' (' + woodAmt + ' min, 5 stamina)';
   const crop = CROPS[s.crop];
   let farmBase = crop.yield;
   if (season() === 'Winter') farmBase = Math.floor(farmBase / 2);
-  const farmAmt = farmBase + s.jobs.farmer * 2 + (state.playerRace === 'human' ? 2 : 0) + (state.playerRace === 'nerida' ? 4 : 0) + (s.research && s.research.farming ? 3 : 0) + (s.research && s.research.tools ? 2 : 0);
+  const farmAmt = farmBase + s.jobs.farmer * 2 + (state.playerRace === 'human' ? 2 : 0) + (state.playerRace === 'nerida' ? 4 : 0) + (s.research && s.research.farming ? 3 : 0) + rankBonus(s, 'farm') + (s.research && s.research.tools ? 2 : 0) + rankBonus(s, 'gather');
   const gf = el('g-food'); if (gf) gf.textContent = '🌾 Farm (' + crop.name + ') — Food +' + farmAmt + ' (' + farmAmt + ' min, 5 stamina)';
   const gh = el('g-hunt'); if (gh) gh.textContent = '🦌 Hunt Animals — Food +8–15 (15 min, 10 stamina)';
-  const stoneAmt = 10 + s.jobs.miner * 2 + (state.playerRace === 'korr' ? 2 : 0) + (s.research && s.research.tools ? 2 : 0);
+  const stoneAmt = 10 + s.jobs.miner * 2 + (state.playerRace === 'korr' ? 2 : 0) + (s.research && s.research.tools ? 2 : 0) + rankBonus(s, 'gather');
   const gs = el('g-stone'); if (gs) gs.textContent = '⛰️ Quarry — Stone +' + stoneAmt + ' (' + stoneAmt + ' min, 5 stamina)';
-  const ironAmt = 8 + s.jobs.miner * 2 + (state.playerRace === 'korr' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0);
+  const ironAmt = 8 + s.jobs.miner * 2 + (state.playerRace === 'korr' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0) + rankBonus(s, 'gather');
   const gi = el('g-iron'); if (gi) gi.textContent = '⛏️ Iron Mine — Iron +' + ironAmt + ' (' + ironAmt + ' min, 5 stamina)';
-  const copperAmt = 8 + s.jobs.miner * 2 + (state.playerRace === 'korr' ? 2 : 0) + (state.playerRace === 'thalen' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0);
+  const copperAmt = 8 + s.jobs.miner * 2 + (state.playerRace === 'korr' ? 2 : 0) + (state.playerRace === 'thalen' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0) + rankBonus(s, 'gather');
   const gc = el('g-copper'); if (gc) gc.textContent = '🟤 Copper Vein — Copper +' + copperAmt + ' (' + copperAmt + ' min, 5 stamina)';
   const gst = el('g-steel'); if (gst) { gst.textContent = '🔥 Forge — Smelt & Craft'; }
   ['g-wood', 'g-food', 'g-hunt', 'g-stone', 'g-iron', 'g-copper', 'g-steel'].forEach(function (id) { const b = el(id); if (b) b.disabled = busy(); });
@@ -713,15 +760,15 @@ function select(id) {
   openZoom();
 }
 function gatherAmount(kind, s) {
-  if (kind === 'wood') return 10 + (state.playerRace === 'veyari' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0) + s.jobs.woodcutter * 2 + (charTrinket() === 'woodsman' ? 2 : 0);
+  if (kind === 'wood') return 10 + (state.playerRace === 'veyari' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0) + rankBonus(s, 'gather') + s.jobs.woodcutter * 2 + (charTrinket() === 'woodsman' ? 2 : 0);
   if (kind === 'food') {
     let base = CROPS[s.crop].yield;
     if (season() === 'Winter') base = Math.floor(base / 2);
-    return base + s.jobs.farmer * 2 + (state.playerRace === 'human' ? 2 : 0) + (state.playerRace === 'nerida' ? 4 : 0) + (s.research && s.research.farming ? 3 : 0) + (s.research && s.research.tools ? 2 : 0) + (charTrinket() === 'farmer' ? 2 : 0);
+    return base + s.jobs.farmer * 2 + (state.playerRace === 'human' ? 2 : 0) + (state.playerRace === 'nerida' ? 4 : 0) + (s.research && s.research.farming ? 3 : 0) + rankBonus(s, 'farm') + (s.research && s.research.tools ? 2 : 0) + rankBonus(s, 'gather') + (charTrinket() === 'farmer' ? 2 : 0);
   }
-  if (kind === 'stone') return 10 + s.jobs.miner * 2 + (state.playerRace === 'korr' ? 2 : 0) + (s.research && s.research.tools ? 2 : 0) + (charTrinket() === 'miner' ? 1 : 0);
-  if (kind === 'iron') return 8 + s.jobs.miner * 2 + (state.playerRace === 'korr' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0) + (charTrinket() === 'miner' ? 1 : 0);
-  if (kind === 'copper') return 8 + s.jobs.miner * 2 + (state.playerRace === 'korr' ? 2 : 0) + (state.playerRace === 'thalen' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0) + (charTrinket() === 'miner' ? 1 : 0);
+  if (kind === 'stone') return 10 + s.jobs.miner * 2 + (state.playerRace === 'korr' ? 2 : 0) + (s.research && s.research.tools ? 2 : 0) + rankBonus(s, 'gather') + (charTrinket() === 'miner' ? 1 : 0);
+  if (kind === 'iron') return 8 + s.jobs.miner * 2 + (state.playerRace === 'korr' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0) + rankBonus(s, 'gather') + (charTrinket() === 'miner' ? 1 : 0);
+  if (kind === 'copper') return 8 + s.jobs.miner * 2 + (state.playerRace === 'korr' ? 2 : 0) + (state.playerRace === 'thalen' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0) + rankBonus(s, 'gather') + (charTrinket() === 'miner' ? 1 : 0);
   return 0;
 }
 function gatherDuration(kind, s) {
@@ -758,7 +805,7 @@ function completeTask(t) {
   const s = settlements[t.settlement];
   if (!s) return;
   if (t.kind === 'steel') {
-    const rate = (state.playerRace === 'korr' ? 4 : 3) + (s.research && s.research.forges ? 1 : 0);
+    const rate = (state.playerRace === 'korr' ? 4 : 3) + (s.research && s.research.forges ? 1 : 0) + rankBonus(s, 'steel');
     s.steel += rate; state.stats.steel += rate; if (s.race === state.playerRace) state.stats.steelHome = (state.stats.steelHome || 0) + rate;
     event('Smelted ' + rate + ' steel from 5 iron.');
     return;
@@ -766,7 +813,7 @@ function completeTask(t) {
   if (t.kind === 'hunt') {
     const animals = [{ name: 'rabbit', food: 8 }, { name: 'deer', food: 12 }, { name: 'boar', food: 15 }];
     const a = animals[rand(0, 2)];
-    const amt = a.food + s.jobs.hunter * 2 + (state.playerRace === 'veyari' ? 2 : 0) + (state.playerRace === 'vesk' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0) + (charTrinket() === 'hunter' ? 2 : 0);
+    const amt = a.food + s.jobs.hunter * 2 + (state.playerRace === 'veyari' ? 2 : 0) + (state.playerRace === 'vesk' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0) + rankBonus(s, 'gather') + (charTrinket() === 'hunter' ? 2 : 0);
     s.food += amt; state.stats.hunts += 1; if (s.race === state.playerRace) state.stats.huntsHome = (state.stats.huntsHome || 0) + 1;
     event('Hunted a ' + a.name + ' (+' + amt + ' food).');
     return;
@@ -1135,7 +1182,7 @@ function equippedBonus(n) {
   return total;
 }
 function partyDamage() {
-  return rand(12, 20) + state.partySize + partyWeaponBonus() + (cur().research && cur().research.weapons ? 4 : 0) + (state.playerRace === 'drakari' ? 5 : 0);
+  return rand(12, 20) + state.partySize + partyWeaponBonus() + (cur().research && cur().research.weapons ? 4 : 0) + rankBonus(cur(), 'damage') + (state.playerRace === 'drakari' ? 5 : 0);
 }
 function lootText(loot) {
   const parts = [];
@@ -1236,16 +1283,29 @@ const RUN_DOORS = [
   { type: 'slime', hint: '🫧 A door slick with ooze' },
   { type: 'bat', hint: '🦇 A door echoing with wings' }
 ];
-function genRunDoors() {
-  const types = ['chest', 'mimic', 'undead', 'goblin', 'spider', 'slime', 'bat', 'shrine'];
-  for (let i = types.length - 1; i > 0; i--) { const j = rand(0, i); const t = types[i]; types[i] = types[j]; types[j] = t; }
-  return types.slice(0, 3).map(function (t) { return RUN_DOORS.filter(function (dd) { return dd.type === t; })[0]; });
+function genRunDoors(prevType) {
+  const all = ['chest', 'mimic', 'undead', 'goblin', 'spider', 'slime', 'bat', 'shrine'];
+  const combat = ['mimic', 'undead', 'goblin', 'spider', 'slime', 'bat'];
+  const reward = ['chest', 'shrine'];
+  function shuffled(arr) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rand(0, i); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  let types;
+  if (prevType) {
+    const cat = combat.indexOf(prevType) !== -1 ? combat : reward;
+    const catShuffled = shuffled(cat);
+    const chosen = [catShuffled[0], catShuffled[1]];
+    const rest = all.filter(function (t) { return chosen.indexOf(t) === -1; });
+    chosen.push(rest[rand(0, rest.length - 1)]);
+    types = shuffled(chosen);
+  } else {
+    types = shuffled(all).slice(0, 3);
+  }
+  return types.map(function (t) { return RUN_DOORS.filter(function (dd) { return dd.type === t; })[0]; });
 }
 function startDungeonRun(areaId, dungeonIndex) {
   const r = state.regions[areaId];
   if (!r || !r.found[dungeonIndex] || r.found[dungeonIndex].cleared) return;
   const d = r.found[dungeonIndex];
-  state.dungeonRun = { areaId: areaId, dungeonIndex: dungeonIndex, roomsLeft: d.big ? 7 : 5, doors: genRunDoors(), chests: 0, shrines: 0, fights: 0, bossChoice: '' };
+  state.dungeonRun = { areaId: areaId, dungeonIndex: dungeonIndex, roomsLeft: d.big ? 12 : 8, doors: genRunDoors(), chests: 0, shrines: 0, fights: 0, bossChoice: '', lastDoor: '' };
   state.runResult = '';
   openDungeonRun();
 }
@@ -1261,8 +1321,10 @@ function openDungeonRun() {
   if (!run) return;
   const r = state.regions[run.areaId];
   const d = r.found[run.dungeonIndex];
-  const total = d.big ? 7 : 5;
-  let html = '<div class="notice">🏰 <strong>' + d.name + '</strong> — ' + d.enemy + ' waits at the end.<br>Rooms left before the boss: ' + run.roomsLeft + ' of ' + total + ' · Your HP: ' + state.hp + '/' + (state.maxHp || 100) + ' · Stamina: ' + (state.stamina === undefined ? 100 : state.stamina) + '/' + (state.maxStamina || 100) + '<br>Exploring takes time: each room and the boss fight move the clock 15 game minutes forward (no waiting).<br>Stamina: chests cost 5, fight rounds cost 5, shrines restore 25.</div>';
+  const total = d.big ? 12 : 8;
+  const combatDoors = ['mimic', 'undead', 'goblin', 'spider', 'slime', 'bat'];
+  const trailNote = !run.lastDoor ? '' : (combatDoors.indexOf(run.lastDoor) !== -1 ? '<br>⚔️ You are on a dangerous trail — more foes lie ahead.' : '<br>💰 You are on a treasure trail — more riches lie ahead.');
+  let html = '<div class="notice">🏰 <strong>' + d.name + '</strong> — ' + d.enemy + ' waits at the end.<br>Rooms left before the boss: ' + run.roomsLeft + ' of ' + total + ' · Your HP: ' + state.hp + '/' + (state.maxHp || 100) + ' · Stamina: ' + (state.stamina === undefined ? 100 : state.stamina) + '/' + (state.maxStamina || 100) + '<br>Exploring takes time: each room and the boss fight move the clock 15 game minutes forward (no waiting).<br>Stamina: chests cost 5, fight rounds cost 5, shrines restore 25.' + trailNote + '</div>';
   if (state.runResult) { html += '<div class="notice">' + state.runResult + '</div>'; state.runResult = ''; }
   if (run.roomsLeft > 0) {
     html += '<h3 style="margin:14px 0 4px">Choose a door</h3>';
@@ -1292,7 +1354,7 @@ function advanceRunRoom() {
   const run = state.dungeonRun;
   if (!run) return;
   run.roomsLeft -= 1;
-  if (run.roomsLeft > 0) run.doors = genRunDoors();
+  if (run.roomsLeft > 0) run.doors = genRunDoors(run.lastDoor);
 }
 function resolveRunDoor(idx) {
   const run = state.dungeonRun;
@@ -1300,6 +1362,7 @@ function resolveRunDoor(idx) {
   const door = run.doors[idx];
   if (!door) return;
   if (busy()) { state.runResult = '⏳ You are busy — finish your current job first.'; openDungeonRun(); return; }
+  run.lastDoor = door.type;
   const s = cur();
   if (door.type === 'chest') {
     if (!spendStamina(5)) { state.runResult = '💤 Not enough stamina to loot this chest (need 5). Shrines restore stamina.'; render(); openDungeonRun(); return; }
@@ -1579,7 +1642,7 @@ function openExplore(areaId) {
         html += '<div class="row"><span>✓ ' + d.name + ' — cleared</span><span class="muted">' + (d.clearedDay !== undefined ? 'Returns Day ' + (d.clearedDay + 7) : 'Loot claimed') + '</span></div>';
       } else {
         html += '<div class="row"><span>' + (d.big ? '👑 ' : '👹 ') + d.name + ' — ' + d.enemy + ' (HP ' + d.hp + '/' + d.maxHp + ')</span><span>Your HP: ' + state.hp + '</span></div>';
-        html += '<button class="choice" data-enter-dungeon="' + areaId + '" data-dungeon="' + i + '"><strong>Enter: ' + d.name + '</strong>Choose your path through rooms of chests, mimics, undead, and shrines — then face ' + d.enemy + ' · About ' + (d.big ? 120 : 90) + ' game minutes</button>';
+        html += '<button class="choice" data-enter-dungeon="' + areaId + '" data-dungeon="' + i + '"><strong>Enter: ' + d.name + '</strong>Choose your path through rooms of chests, mimics, undead, and shrines — then face ' + d.enemy + ' · About ' + (d.big ? 195 : 135) + ' game minutes</button>';
       }
     });
   }
@@ -1626,7 +1689,7 @@ function craftArmor(key) {
 let forgeQty = 1;
 function openForge() {
   const s = cur();
-  const steelRate = (state.playerRace === 'korr' ? 4 : 3) + (s.research && s.research.forges ? 1 : 0);
+  const steelRate = (state.playerRace === 'korr' ? 4 : 3) + (s.research && s.research.forges ? 1 : 0) + rankBonus(s, 'steel');
   let html = '<div class="notice">🔥 <strong>Forge — ' + s.name + '</strong><br>Smelt steel, craft weapons for your adventurers, or armor for yourself. Armor reduces the damage YOU take in fights.' + (hasRacePerk('korr') ? '<br>🔨 Korr perk active: forge costs 20% off.' : '') + '</div>';
   html += '<div class="muted" style="font-size:13px;margin:6px 0">How many at once: <button data-forge-qty="1" style="display:inline-block;width:auto;padding:4px 10px;margin:2px' + (forgeQty === 1 ? ';font-weight:bold' : '') + '">×1</button><button data-forge-qty="5" style="display:inline-block;width:auto;padding:4px 10px;margin:2px' + (forgeQty === 5 ? ';font-weight:bold' : '') + '">×5</button><button data-forge-qty="all" style="display:inline-block;width:auto;padding:4px 10px;margin:2px' + (forgeQty === 'all' ? ';font-weight:bold' : '') + '">×All</button></div>';   html += '<button class="choice" data-smelt="1"' + (s.iron < 5 || busy() ? ' disabled' : '') + '><strong>Smelt steel</strong>5 iron → ' + steelRate + ' steel (10 game min, 5 stamina)' + (s.iron < 5 ? ' — not enough iron' : busy() ? ' — you are busy' : '') + '</button>';
   html += '<h3 style="margin:14px 0 4px">Weapons</h3>';
@@ -1737,23 +1800,32 @@ function craftArmorBulk(qty) {
 }
 function openResearch() {
   const s = cur();
-  let html = '<div class="notice">🔬 <strong>Research — ' + s.name + '</strong><br>Research is paid for from THIS settlement and applies to THIS settlement only. Each settlement must research separately.</div>';
-  Object.keys(RESEARCH).forEach(function (k) {
-    const r = RESEARCH[k];
-    if (s.research && s.research[k]) {
-      html += '<div class="row"><span>✓ ' + r.name + ' — ' + r.desc + '</span><span class="muted">Researched</span></div>';
-    } else {
-      const afford = canAfford(s, r.cost);
-      html += '<button class="choice" data-research="' + k + '"' + (afford ? '' : ' disabled') + '><strong>' + r.name + '</strong>' + r.desc + ' · Costs ' + costText(r.cost) + (afford ? '' : ' — not enough resources') + '</button>';
+  let html = '<div class="notice">🔬 <strong>Research — ' + s.name + '</strong><br>Research is paid for from THIS settlement and applies to THIS settlement only. Each settlement must research separately. Each rank unlocks new research fitting that rank.</div>';
+  RANK_RESEARCH.forEach(function (list, r) {
+    const rankName = RANKS[r] ? RANKS[r].name : ('Rank ' + r);
+    if (r > state.rank) {
+      html += '<div class="row"><span>🔒 ' + rankName + ' research</span><span class="muted">Unlocks at ' + rankName + '</span></div>';
+      return;
     }
+    html += '<h3 style="margin:14px 0 4px">' + rankName + ' research</h3>';
+    list.forEach(function (it) {
+      if (s.research && s.research[it.key]) {
+        html += '<div class="row"><span>✓ ' + it.name + ' — ' + it.desc + '</span><span class="muted">Researched</span></div>';
+      } else {
+        const afford = canAfford(s, it.cost);
+        html += '<button class="choice" data-research="' + it.key + '"' + (afford ? '' : ' disabled') + '><strong>' + it.name + '</strong>' + it.desc + ' · Costs ' + costText(it.cost) + (afford ? '' : ' — not enough resources') + '</button>';
+      }
+    });
   });
   openModal('Research — ' + s.name, 'Unlock permanent improvements.', html);
   bindModalButtons();
 }
 function doResearch(key) {
   const s = cur();
-  const r = RESEARCH[key];
-  if (!r || (s.research && s.research[key]) || !canAfford(s, r.cost)) return;
+  const found = rankResearchByKey(key);
+  if (!found || found.rank > state.rank) return;
+  const r = found.item;
+  if ((s.research && s.research[key]) || !canAfford(s, r.cost)) return;
   Object.keys(r.cost).forEach(function (k) { s[k] -= r.cost[k]; });
   if (!s.research) s.research = {};
   s.research[key] = true;
@@ -2030,7 +2102,7 @@ const RANKS = [
     { text: 'Hunt 25 times at home', done: false, check: function () { return ((state.stats.huntsHome || 0) - ((state.rankBaseline && state.rankBaseline.huntsHome) || 0)) >= 25; } },
     { text: 'Build 25 buildings in total at home', done: false, check: function () { return ((state.stats.builtHome || 0) - ((state.rankBaseline && state.rankBaseline.builtHome) || 0)) >= 25; } },
     { text: 'Assign 20 workers in total', done: false, check: function () { return totalJobs() >= 20; } },
-    { text: 'Research all 6 technologies in your home settlement', done: false, check: function () { return homeS(function (s) { return Object.keys(s.research || {}).length >= 6; }); } },
+    { text: 'Research every technology in your home settlement', done: false, check: function () { return homeS(function (s) { return Object.keys(s.research || {}).length >= totalRankResearch(); }); } },
     { text: 'Hold 2000 khan in your home settlement', done: false, check: function () { return homeS(function (s) { return s.khan >= 2000; }); } },
     { text: 'Have 5 settlements with 50+ citizens', done: false, check: function () { return countS(function (s) { return s.pop >= 50; }) >= 5; } },
     { text: 'Clear every dungeon', done: false, check: function () { return Object.keys(state.dungeonsClearedEver || {}).length >= totalDungeons(); } },
@@ -2247,14 +2319,15 @@ function debugSnapshotRestore() {
 }
 function openDebugPrompt() {
   if (debugOpen) { openDebugPanel(); return; }
-  openModal('Owner', 'Enter the word.', '<div class="row"><span>Word</span><span><input id="debug-word-input" type="password" style="width:150px"> <button data-debug-unlock="1">Unlock</button></span></div>');
+  openModal('Debug', 'Enter the word.', '<div class="row"><span>Word</span><span><input id="debug-word-input" type="password" style="width:150px"> <button data-debug-unlock="1">Unlock</button></span></div>');
   bindModalButtons();
 }
 function debugUnlock() {
   const input = el('debug-word-input');
   const word = input ? input.value.trim().toLowerCase() : '';
-  if (word !== DEBUG_WORD.toLowerCase()) { event('That is not the word.'); openDebugPrompt(); return; }
-  openDebugPanel();
+  if (word === DEBUG_WORD.toLowerCase()) { debugGuest = false; openDebugPanel(); return; }
+  if (word === DEBUG_WORD_GUEST.toLowerCase()) { debugGuest = true; openDebugPanel(); return; }
+  event('That is not the word.'); openDebugPrompt(); return;
 }
 function openDebugPanel() {
   if (!debugOpen) { saveGame(); debugSnapshot = debugSnapshotTake(); debugOpen = true; }
@@ -2264,7 +2337,7 @@ function openDebugPanel() {
   let setOpts = '';
   Object.keys(settlements).forEach(function (id) { setOpts += '<option value="' + id + '"' + (state.current === id ? ' selected' : '') + '>' + settlements[id].name + '</option>'; });
   const cs = cur();
-  let html = '<div class="notice">Testing only. Autosave is paused while this is open (the clock keeps running). Use Restore my game to put everything back exactly as it was, or Keep changes to keep what you set. (Closing this window with X leaves debug paused — enter the word again to come back.)</div>';
+  let html = debugGuest ? '<div class="notice">Guest debug — changes here are temporary. Autosave is paused while this is open (the clock keeps running). There is no save option: use Restore my game to put everything back now, or just close the game and it will revert on its own. (Closing this window with X leaves debug paused — enter the word again to come back.)</div>' : '<div class="notice">Testing only. Autosave is paused while this is open (the clock keeps running). Use Restore my game to put everything back exactly as it was, or Keep changes to keep what you set. (Closing this window with X leaves debug paused — enter the word again to come back.)</div>';
   html += '<h3 style="margin:14px 0 4px">Rank</h3><div class="row"><span>Your rank</span><span><select id="debug-rank">' + rankOpts + '</select> <button data-debug-rank="1">Set rank</button></span></div>';
   html += '<h3 style="margin:14px 0 4px">Settlement</h3><div class="row"><span>Settlement</span><span><select id="debug-settlement">' + setOpts + '</select></span></div>';
   html += '<div class="row"><span>Population</span><span><input id="debug-pop" type="number" value="' + cs.pop + '" style="width:100px"> <button data-debug-pop="1">Set population</button></span></div>';
@@ -2272,8 +2345,8 @@ function openDebugPanel() {
   html += '<h3 style="margin:14px 0 4px">Time</h3><div class="row"><span>Day</span><span><input id="debug-day" type="number" value="' + state.clock.day + '" style="width:100px"> <button data-debug-day="1">Set day</button></span></div>';
   html += '<div class="row"><span>Clock</span><span><button data-debug-night="1">Set to night (22:00)</button> <button data-debug-morning="1">Set to morning (06:00)</button></span></div>';
   html += '<div class="row"><span>Fast clock</span><span><button class="choice' + (debugFast ? ' chosen' : '') + '" data-debug-fast="1">⏩ Fast time: ' + (debugFast ? 'ON (10×)' : 'OFF') + '</button></span></div>';
-  html += '<h3 style="margin:14px 0 4px">Exit debug</h3><div class="row"><span></span><span><button data-debug-restore="1">Restore my game</button> <button data-debug-keep="1">Keep changes</button></span></div>';
-  openModal('🔧 Owner Debug', 'Your real game is untouched unless you press Keep changes.', html);
+  html += '<h3 style="margin:14px 0 4px">Exit debug</h3><div class="row"><span></span><span><button data-debug-restore="1">Restore my game</button>' + (debugGuest ? '' : ' <button data-debug-keep="1">Keep changes</button>') + '</span></div>';
+  openModal(debugGuest ? '🔧 Guest Debug' : '🔧 Owner Debug', debugGuest ? 'Changes here are temporary and will revert when the game closes.' : 'Your real game is untouched unless you press Keep changes.', html);
   bindModalButtons();
   const ds = el('debug-settlement');
   if (ds) ds.onchange = function () { const s = settlements[ds.value]; const pi = el('debug-pop'); if (s && pi) pi.value = s.pop; };
@@ -2310,12 +2383,12 @@ function debugSetMorning() { state.clock.minutes = 6 * 60; state.clock.secs = 0;
 function debugToggleFast() { debugFast = !debugFast; event(debugFast ? 'Fast time ON — the clock runs 10× faster.' : 'Fast time OFF — the clock is back to normal.'); openDebugPanel(); }
 function debugRestore() {
   debugSnapshotRestore();
-  debugSnapshot = null; debugOpen = false; debugFast = false;
+  debugSnapshot = null; debugOpen = false; debugFast = false; debugGuest = false;
   closeModal(); render();
   event('Debug closed — your game is exactly as it was.');
 }
 function debugKeep() {
-  debugSnapshot = null; debugOpen = false; debugFast = false;
+  debugSnapshot = null; debugOpen = false; debugFast = false; debugGuest = false;
   closeModal(); render();
   event('Debug closed — changes kept and will save normally.');
 }
@@ -2386,8 +2459,8 @@ const RACE_BENEFIT = {
   drakari: 'Benefit: party damage +5, dragon strength in fights.',
   vesk: 'Benefit: hunts +4 food.', nerida: 'Benefit: farms +4 food.'
 };
-function sellPrice(k) { return SELL[k] + (state.playerRace === 'human' ? 2 : 0) + (cur().research && cur().research.networks ? 1 : 0) + (hasRacePerk('thalen') ? 2 : 0); }
-function buyPrice(k) { const b = BUY[k] - (state.playerRace === 'human' ? 2 : 0) - (cur().research && cur().research.networks ? 1 : 0) - (hasRacePerk('thalen') ? 2 : 0); const s = sellPrice(k); return b > s ? b : s + 1; }
+function sellPrice(k) { return SELL[k] + (state.playerRace === 'human' ? 2 : 0) + (cur().research && cur().research.networks ? 1 : 0) + rankBonus(cur(), 'sell') + (hasRacePerk('thalen') ? 2 : 0); }
+function buyPrice(k) { const b = BUY[k] - (state.playerRace === 'human' ? 2 : 0) - (cur().research && cur().research.networks ? 1 : 0) - rankBonus(cur(), 'buy') - (hasRacePerk('thalen') ? 2 : 0); const s = sellPrice(k); return b > s ? b : s + 1; }
 function renameCharacter() {
   const input = el('char-name-input');
   const v = input ? input.value.trim() : '';
@@ -2508,7 +2581,7 @@ function openGuide() {
   html += '<p style="font-size:13px;margin:6px 0"><strong>🏠 Human — Ravenholt:</strong> better prices (sell +2 khan, buy −2 khan) and farms +2 food.<br><strong>🌳 Veyari — Elderwood:</strong> +4 wood per gather, hunts +2 food.<br><strong>🏭 Korr — Ironhold:</strong> +4 iron, +2 stone and copper per gather, and forges turn 5 iron into 4 steel.<br><strong>🗼 Thalen — The Spires:</strong> scholars produce knowledge each day, +4 copper per gather, knowledge sells for khan.<br><strong>🐉 Draconians — Emberpeak:</strong> party damage +5 in fights.<br><strong>🦎 Vesk — Fangmire:</strong> hunts +4 food.<br><strong>🧜 Nerida — Tidehaven:</strong> farms +4 food.</p>';
   html += '<h3 style="margin:14px 0 4px">What you do</h3><p style="font-size:13px;margin:6px 0">Click a settlement on the map to visit it. Gather wood, food, stone, iron, and copper. Smelt steel at the forge. Build houses to grow your people, and prisons (stocks, cages, pillory, jail) to hold criminals — the crowd can even pelt them with tomatoes. Trade surplus for khan, send aid to neighbors, or ask them for aid. Form alliances for daily gifts and race perks: Korr cuts forge costs 20%, Veyari allies send 10 food a day, Thalen improves prices (+2 sell, −2 buy), Humans cut building costs 20%, Draconians allies send 10 khan a day, Vesk allies send 5 iron a day, Nerida allies send 5 copper a day. Your own race perk is always active. Doing things costs stamina: gathering and smelting 5, hunting and searching 10, dungeon chests 5, fight rounds 5. Stamina comes back over time, at shrines, and fully when you sleep.</p>';
   html += '<h3 style="margin:14px 0 4px">Your people work for you</h3><p style="font-size:13px;margin:6px 0">Assign adults to jobs, one at a time or five at a time: Hunters bring food, Farmers work the fields, Miners dig stone, iron, and copper, Woodcutters bring wood, Scholars earn khan (and knowledge for Thalen), Adventurers fight and defend. Jobs produce every day. Children study a trade and take it up when they grow up. Settlements you are not visiting hire, gather, and build on their own — visit one after a while and it will tell you what changed.</p>';
-  html += '<h3 style="margin:14px 0 4px">Research, weapons, and fighting</h3><p style="font-size:13px;margin:6px 0">Each settlement researches separately: better tools, farming, buildings, weapons, forges, and trade networks. Craft weapons at the forge — club, dagger, mace, spear, sword, axes, bow, warhammer — and upgrade each one from basic to Fine, Superior, Masterwork, and Peerless, the best there is. In Manage People you choose exactly what each adventurer carries. Parties of 5 to 10 adventurers explore 49 dungeons across 10 areas (a dungeon run takes about an hour and a half (two hours for a big dungeon), jumped forward — no waiting), fight roaming monsters that attack settlements, and can flee a fight — but losing one ends your run. Every 4th dungeon you clear anywhere pays double loot and a guaranteed drop.</p>';
+  html += '<h3 style="margin:14px 0 4px">Research, weapons, and fighting</h3><p style="font-size:13px;margin:6px 0">Each settlement researches separately, and each rank unlocks new research fitting that rank — from basic tools as a Peasant to grand projects as an Eternal King. Craft weapons at the forge — club, dagger, mace, spear, sword, axes, bow, warhammer — and upgrade each one from basic to Fine, Superior, Masterwork, and Peerless, the best there is. In Manage People you choose exactly what each adventurer carries. Parties of 5 to 10 adventurers explore 49 dungeons across 10 areas (a dungeon run takes about two hours and a quarter (three hours and a quarter for a big dungeon), jumped forward — no waiting), fight roaming monsters that attack settlements, and can flee a fight — but losing one ends your run. Every 4th dungeon you clear anywhere pays double loot and a guaranteed drop.</p>';
   html += '<h3 style="margin:14px 0 4px">Time and saving</h3><p style="font-size:13px;margin:6px 0">The clock runs live (1 real minute = 10 game minutes) or turn-based — tap the clock button to switch. Sleep at night to jump to morning. The game saves itself every 30 seconds and when you close it, so you can continue right where you left off.</p>';
   html += '<button class="choice" data-guide-race="1"><strong>Create your character →</strong>Pick your name, age, and race, then begin.</button>';
   openModal('📖 Guide — The Foundations', 'Read this first, then create your character.', html);
