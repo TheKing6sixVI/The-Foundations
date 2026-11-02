@@ -319,7 +319,7 @@ function tick() {
     state.tasks = state.tasks.filter(function (t) { return t.endsAt > nowTotal(); });
     checkMissions(); render();
   }
-  autoCollectTick(prevTotal, nowTotal());
+  if (autoCollectTick(prevTotal, nowTotal())) render();
   updateClockUI();
 }
 if (typeof window !== 'undefined' && window.setInterval) { setInterval(tick, 1000); setInterval(saveGame, 30000); }
@@ -842,13 +842,15 @@ function setCrop(crop) {
 function autoCollectUnlocked(s) { return s.pop >= 100 && state.rank >= 6; }
 function autoCollectTick(prevTotal, newTotal) {
   const n = Math.floor(newTotal / 10) - Math.floor(prevTotal / 10);
-  if (n <= 0) return;
+  if (n <= 0) return false;
+  let granted = false;
   Object.keys(settlements).forEach(function (id) {
     const s = settlements[id];
     if (s.autoCollect && autoCollectUnlocked(s)) {
-      s.wood += 10 * n; s.stone += 10 * n; s.iron += 10 * n; s.copper += 10 * n; s.steel += 10 * n; s.food += 10 * n; s.khan += 10 * n;
+      s.wood += 10 * n; s.stone += 10 * n; s.iron += 10 * n; s.copper += 10 * n; s.steel += 10 * n; s.food += 10 * n; s.khan += 10 * n; granted = true;
     }
   });
+  return granted;
 }
 function toggleAutoCollect() {
   const s = cur();
