@@ -528,7 +528,7 @@ function onNewDay() {
     } else {
       s.sick = Math.max(0, s.sick - 1);
     }
-    if (Math.random() < 0.3) {
+    if (Math.random() < 0.5) {
       const was = s.sick;
       s.sick = Math.min(s.pop, s.sick + rand(1, 3));
       if (was === 0 && s.sick > 0) event('Some citizens in ' + s.name + ' fell sick.');
@@ -3045,7 +3045,7 @@ function trainHealth() {
   render(); openCharacter();
 }
 function openGuide() {
-  let html = '<p><strong>Welcome to the Foundations.</strong> The Old World fell in the Fall, and seven settlements rose on its foundations. You manage them, gather, build, trade, and fight your way from Peasant to King of the World.</p>';
+  let html = '<p><strong>Welcome to the Foundations.</strong> The Old World fell in the Fall, and seven settlements rose on its foundations. You manage them, gather, build, trade, and fight your way from Peasant to King of the World.</p>' + '<p class="muted" style="font-size:13px;margin:6px 0">Note: this guide stays open until you create a character, so the X button does not close it yet. When you are ready, use the Create your character button below.</p>';
   html += '<h3 style="margin:14px 0 4px">Your race</h3><p class="muted" style="font-size:13px;margin:0">Pick one, and give your character a name and age. Your race is locked for the whole run, until you win, die, or reset. Your race benefits follow you everywhere.</p>';
   html += '<p style="font-size:13px;margin:6px 0"><strong>🏠 Human — Ravenholt:</strong> better prices (sell +2 khan, buy −2 khan) and farms +2 food.<br><strong>🌳 Veyari — Elderwood:</strong> +4 wood per gather, hunts +2 food.<br><strong>🏭 Korr — Ironhold:</strong> +4 iron, +2 stone and copper per gather, and forges turn 5 iron into 4 steel.<br><strong>🗼 Thalen — The Spires:</strong> scholars produce knowledge each day, +4 copper per gather, knowledge sells for khan.<br><strong>🐉 Draconians — Emberpeak:</strong> party damage +5 in fights.<br><strong>🦎 Vesk — Fangmire:</strong> hunts +4 food.<br><strong>🧜 Nerida — Tidehaven:</strong> farms +4 food.</p>';
   html += '<h3 style="margin:14px 0 4px">What you do</h3><p style="font-size:13px;margin:6px 0">Click a settlement on the map to visit it. Gather wood, food, stone, iron, and copper. Smelt steel at the forge. Build houses to grow your people, and prisons (stocks, cages, pillory, jail) to hold criminals — the crowd can even pelt them with tomatoes. Trade surplus for khan, send aid to neighbors, or ask them for aid. Form alliances for daily gifts and race perks: Korr cuts forge costs 20%, Veyari allies send 10 food a day, Thalen improves prices (+2 sell, −2 buy), Humans cut building costs 20%, Draconians allies send 10 khan a day, Vesk allies send 5 iron a day, Nerida allies send 5 copper a day. Your own race perk is always active. Doing things costs stamina: gathering and smelting 5, hunting and searching 10, dungeon chests 5, fight rounds 5. Stamina comes back over time, at shrines, and fully when you sleep.</p>';
