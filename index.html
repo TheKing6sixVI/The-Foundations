@@ -846,7 +846,7 @@ function autoCollectTick(prevTotal, newTotal) {
   Object.keys(settlements).forEach(function (id) {
     const s = settlements[id];
     if (s.autoCollect && autoCollectUnlocked(s)) {
-      s.wood += 10 * n; s.stone += 10 * n; s.iron += 10 * n; s.copper += 10 * n;
+      s.wood += 10 * n; s.stone += 10 * n; s.iron += 10 * n; s.copper += 10 * n; s.steel += 10 * n; s.food += 10 * n; s.khan += 10 * n;
     }
   });
 }
@@ -863,10 +863,10 @@ function openManage() {
   const cap = capacity(s);
   let html = '<div class="notice"><strong>People:</strong> ' + s.pop + ' citizens — ' + adults(s) + ' adults, ' + s.children + ' children, ' + s.elderly + ' elderly, ' + s.sick + ' sick.<br><strong>Housing:</strong> ' + s.pop + ' / ' + cap + (s.pop > cap ? ' — overcrowded, crime will rise.' : '') + '<br><strong>Crime:</strong> ' + s.crime + ' (' + crimeLabel(s.crime) + ') · <strong>Stability:</strong> ' + s.stability + '% · <strong>Prisoners:</strong> ' + (s.prisoners || 0) + ' / ' + prisonCap(s) + ' cells<br><strong>Reserves:</strong> ' + s.food + ' food, ' + s.wood + ' wood, ' + s.stone + ' stone, ' + s.iron + ' iron, ' + s.steel + ' steel, ' + s.copper + ' copper, ' + s.khan + ' khan.</div>';
   if (autoCollectUnlocked(s)) {
-    html += '<h3 style="margin:14px 0 4px">Auto-collect</h3><p class="muted" style="font-size:13px;margin:0">Every 10 game minutes adds 10 wood, stone, iron, and copper automatically. No stamina, no task slot.</p>';
+    html += '<h3 style="margin:14px 0 4px">Auto-collect</h3><p class="muted" style="font-size:13px;margin:0">Every 10 game minutes adds 10 of each resource except mithril and adamantine automatically. No stamina, no task slot.</p>';
     html += '<button class="choice' + (s.autoCollect ? ' chosen' : '') + '" data-autocollect="1"><strong>Auto-collect: ' + (s.autoCollect ? 'ON' : 'OFF') + '</strong>' + (s.autoCollect ? 'Collecting each day' : 'Tap to turn on') + '</button>';
   } else {
-    html += '<h3 style="margin:14px 0 4px">Auto-collect</h3><p class="muted" style="font-size:13px;margin:0">Unlocks at 100 residents and Lord rank (currently ' + s.pop + ' residents, ' + rankName() + '). Every 10 game minutes will add 10 wood, stone, iron, and copper automatically.</p>';
+    html += '<h3 style="margin:14px 0 4px">Auto-collect</h3><p class="muted" style="font-size:13px;margin:0">Unlocks at 100 residents and Lord rank (currently ' + s.pop + ' residents, ' + rankName() + '). Every 10 game minutes will add 10 of each resource except mithril and adamantine automatically.</p>';
   }
   html += '<h3 style="margin:14px 0 4px">Choose crops</h3><p class="muted" style="font-size:13px;margin:0">The farm harvest changes with your crop. Winter halves farm yields.</p>';
   Object.keys(CROPS).forEach(function (c) {
