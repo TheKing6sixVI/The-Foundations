@@ -305,8 +305,8 @@ let debugOpen = false;
 let debugSnapshot = null;
 const DEBUG_WORD = 'Joy';
 function tick() {
-  if (debugOpen) return;
   if (state.timeMode === 'turn') return;
+  const prevTotal = nowTotal();
   state.clock.secs = (state.clock.secs || 0) + 10;
   if (state.clock.secs >= 60) { state.clock.secs -= 60; state.clock.minutes += 1; if (state.clock.minutes % 60 === 0 && state.stamina !== undefined && state.stamina < (state.maxStamina || 100)) state.stamina = Math.min(state.maxStamina || 100, state.stamina + 5); }
   if (state.clock.minutes >= 1440) {
@@ -319,6 +319,7 @@ function tick() {
     state.tasks = state.tasks.filter(function (t) { return t.endsAt > nowTotal(); });
     checkMissions(); render();
   }
+  autoCollectTick(prevTotal, nowTotal());
   updateClockUI();
 }
 if (typeof window !== 'undefined' && window.setInterval) { setInterval(tick, 1000); setInterval(saveGame, 30000); }
@@ -346,6 +347,7 @@ function capJobs(s) {
 }
 function advanceTime(mins) {
   const c = state.clock;
+  const prevTotal = nowTotal();
   c.minutes += mins;
   if (state.stamina !== undefined && state.stamina < (state.maxStamina || 100)) {
     const crossed = Math.floor(c.minutes / 60) - Math.floor((c.minutes - mins) / 60);
@@ -354,6 +356,7 @@ function advanceTime(mins) {
   while (c.minutes >= 1440) { c.minutes -= 1440; c.day += 1; onNewDay(); }
   const s = season();
   if (s !== state.lastSeason) { state.lastSeason = s; event('The season changes to ' + s + '.'); }
+  autoCollectTick(prevTotal, nowTotal());
   checkMissions();
 }
 function prisonCap(s) { return s.buildings.reduce(function (t, b) { return t + (BUILDINGS[b].prisoners || 0); }, 0); }
@@ -366,12 +369,6 @@ function dailyProduction(s) {
   s.stone += s.jobs.miner * 2 + (s.race === 'korr' ? s.jobs.miner : 0);
   s.iron += s.jobs.miner * 2 + (s.race === 'korr' ? s.jobs.miner * 2 : 0);
   s.copper += s.jobs.miner + (s.race === 'korr' ? s.jobs.miner : 0) + (s.race === 'thalen' ? s.jobs.miner * 2 : 0);
-  if (s.autoCollect && autoCollectUnlocked(s)) {
-    s.wood += gatherAmount('wood', s);
-    s.stone += gatherAmount('stone', s);
-    s.iron += gatherAmount('iron', s);
-    s.copper += gatherAmount('copper', s);
-  }
 }
 function aiAssignJobs(s) {
   let assigned = 0;
@@ -842,6 +839,16 @@ function setCrop(crop) {
   openManage();
 }
 function autoCollectUnlocked(s) { return s.pop >= 100 && state.rank >= 6; }
+function autoCollectTick(prevTotal, newTotal) {
+  const n = Math.floor(newTotal / 10) - Math.floor(prevTotal / 10);
+  if (n <= 0) return;
+  Object.keys(settlements).forEach(function (id) {
+    const s = settlements[id];
+    if (s.autoCollect && autoCollectUnlocked(s)) {
+      s.wood += 10 * n; s.stone += 10 * n; s.iron += 10 * n; s.copper += 10 * n;
+    }
+  });
+}
 function toggleAutoCollect() {
   const s = cur();
   if (!autoCollectUnlocked(s)) { const missing = []; if (s.pop < 100) missing.push('100 residents (have ' + s.pop + ')'); if (state.rank < 6) missing.push('Lord rank (are ' + rankName() + ')'); event('Auto-collect unlocks at ' + missing.join(' and ') + '.'); return; }
@@ -855,10 +862,10 @@ function openManage() {
   const cap = capacity(s);
   let html = '<div class="notice"><strong>People:</strong> ' + s.pop + ' citizens — ' + adults(s) + ' adults, ' + s.children + ' children, ' + s.elderly + ' elderly, ' + s.sick + ' sick.<br><strong>Housing:</strong> ' + s.pop + ' / ' + cap + (s.pop > cap ? ' — overcrowded, crime will rise.' : '') + '<br><strong>Crime:</strong> ' + s.crime + ' (' + crimeLabel(s.crime) + ') · <strong>Stability:</strong> ' + s.stability + '% · <strong>Prisoners:</strong> ' + (s.prisoners || 0) + ' / ' + prisonCap(s) + ' cells<br><strong>Reserves:</strong> ' + s.food + ' food, ' + s.wood + ' wood, ' + s.stone + ' stone, ' + s.iron + ' iron, ' + s.steel + ' steel, ' + s.copper + ' copper, ' + s.khan + ' khan.</div>';
   if (autoCollectUnlocked(s)) {
-    html += '<h3 style="margin:14px 0 4px">Auto-collect</h3><p class="muted" style="font-size:13px;margin:0">Each new day adds one gather of wood, stone, iron, and copper automatically. No stamina, no task slot.</p>';
+    html += '<h3 style="margin:14px 0 4px">Auto-collect</h3><p class="muted" style="font-size:13px;margin:0">Every 10 game minutes adds 10 wood, stone, iron, and copper automatically. No stamina, no task slot.</p>';
     html += '<button class="choice' + (s.autoCollect ? ' chosen' : '') + '" data-autocollect="1"><strong>Auto-collect: ' + (s.autoCollect ? 'ON' : 'OFF') + '</strong>' + (s.autoCollect ? 'Collecting each day' : 'Tap to turn on') + '</button>';
   } else {
-    html += '<h3 style="margin:14px 0 4px">Auto-collect</h3><p class="muted" style="font-size:13px;margin:0">Unlocks at 100 residents and Lord rank (currently ' + s.pop + ' residents, ' + rankName() + '). Each new day will add wood, stone, iron, and copper automatically.</p>';
+    html += '<h3 style="margin:14px 0 4px">Auto-collect</h3><p class="muted" style="font-size:13px;margin:0">Unlocks at 100 residents and Lord rank (currently ' + s.pop + ' residents, ' + rankName() + '). Every 10 game minutes will add 10 wood, stone, iron, and copper automatically.</p>';
   }
   html += '<h3 style="margin:14px 0 4px">Choose crops</h3><p class="muted" style="font-size:13px;margin:0">The farm harvest changes with your crop. Winter halves farm yields.</p>';
   Object.keys(CROPS).forEach(function (c) {
@@ -2033,11 +2040,14 @@ const LORE = {
   human: { title: 'Humans — Ravenholt', body: "<p>Humans are the builders and the stubborn ones. Ravenholt stands where an Old World research facility once studied the land itself, and its people still dig knowledge out of the rubble along with their crops. They raise wood shacks first and cobblestone houses after, because a human settlement is never finished — it is always being rebuilt a little bigger, a little stronger.</p><p>Humans have no ancient magic and no mountain forges. What they have is numbers, nerve, and neighbors: they will trade with anyone, learn anything, and take in anyone willing to work.</p>" },
   veyari: { title: 'Veyari — Elderwood', body: "<p>The Veyari are the forest's children — tall, quiet, and older than any human road. When the Fall came, the forests took back the land, and the Veyari went with them, building homes in the massive trees and walking canopy paths no outsider can follow.</p><p>They do not cut the forest; they grow with it. Their wood huts and tree homes are shaped from living timber, and their hunters and gatherers know every root and stream. Outsiders call them elves. The Veyari just call themselves the people who stayed.</p>" },
   korr: { title: 'Korr — Ironhold', body: "<p>The Korr are the forge-folk of the mountains — short, broad, and stubborn as the stone they cut. They are not dwarfs, and they will correct you on that point at length. What they are is the best metalworkers alive: their halls are iron and steel, their forges never cool, and a Korr blade or beam is worth more than gold in any market.</p><p>Ironhold was dug from a mountain that already held Old World mines, and the Korr have been pulling ore, machines, and secrets out of the deep ever since. They love a good contract, a hot forge, and a settlement that pays its debts.</p>" },
-  thalen: { title: 'Thalen — The Spires', body: "<p>The Thalen are scholars of the strange — the ones who look at the Old World's broken machines and see not junk, but unfinished work. Their towers of crystal and stone rise over the highlands, catching light that should not exist and humming with ley lines the other races prefer not to think about.</p><p>They study, they record, and they keep the knowledge the other settlements need. But the highest tower is sealed, and even the Thalen do not speak of what is kept there — only that something old watches over the Spires, and that it has a name the wind does not like to carry.</p>" }
+  thalen: { title: 'Thalen — The Spires', body: "<p>The Thalen are scholars of the strange — the ones who look at the Old World's broken machines and see not junk, but unfinished work. Their towers of crystal and stone rise over the highlands, catching light that should not exist and humming with ley lines the other races prefer not to think about.</p><p>They study, they record, and they keep the knowledge the other settlements need. But the highest tower is sealed, and even the Thalen do not speak of what is kept there — only that something old watches over the Spires, and that it has a name the wind does not like to carry.</p>" },
+  drakari: { title: 'Draconians — Emberpeak', body: "<p>The Draconians are dragon-kin — scaled, proud, and at home where the earth burns. Emberpeak rises from volcanic rock, and its people roost among ember caves and black stone, in lairs and citadels built to hold heat and weather storms of ash. Fire is not a danger to them; it is a neighbor, a tool, and a test.</p><p>They are fierce in a fight and fiercer still about their peaks — no one takes Emberpeak ground without paying for it in blood and burnt boots. Traders who come in peace find fair dealing and strong walls; those who come for trouble find that the mountain itself seems to fight back.</p>" },
+  vesk: { title: 'Vesk — Fangmire', body: "<p>The Vesk are reptilian folk of the swamp delta — patient, watchful, and at home in water and mud where heavier boots sink. Fangmire is a place of reed huts and sun temples, where raised paths wind between channels and the sun is welcomed over the reeds after the mist burns off.</p><p>The swamp feeds those who know it, and the Vesk know it best: hunters and fishers who read the water, the reeds, and the weather like a map. Great serpents move in the deep mire, and the Vesk give them a wide berth — or a wide net, depending on the day.</p>" },
+  nerida: { title: 'Nerida — Tidehaven', body: "<p>The Nerida are merfolk — amphibious, graceful, and at home in water and on land alike. Tidehaven sits where the shore meets the sea, a settlement of shell huts, tide homes, and coral halls strung between tide pools and shore paths, changing shape with every tide.</p><p>They farm the tide pools and the shore fields, read the moon and the currents, and trade with land folk for what the sea cannot give. The sea is generous and it is hungry in equal measure — great serpents prowl the deeper water, and the Nerida respect them the way sailors respect a storm: from a careful distance.</p>" }
 };
 function openLore() {
   let html = '';
-  ['world', 'human', 'veyari', 'korr', 'thalen'].forEach(function (k) {
+  ['world', 'human', 'veyari', 'korr', 'thalen', 'drakari', 'vesk', 'nerida'].forEach(function (k) {
     html += '<h3 style="margin:14px 0 4px">' + LORE[k].title + '</h3>' + LORE[k].body;
   });
   openModal('World Lore', 'The world of the Foundations and the people rebuilding it.', html);
@@ -2187,24 +2197,18 @@ const gi = el('g-iron'); if (gi) gi.onclick = function () { startTask('iron'); }
 const gc = el('g-copper'); if (gc) gc.onclick = function () { startTask('copper'); };
 const gst = el('g-steel'); if (gst) gst.onclick = openForge;
 const bm = el('btn-manage'); if (bm) bm.onclick = openManage;
+function debugClone(v) {
+  try { return structuredClone(v); } catch (e) { return JSON.parse(JSON.stringify(v)); }
+}
 function debugSnapshotTake() {
-  const snap = { rank: state.rank, day: state.clock.day, minutes: state.clock.minutes, secs: state.clock.secs || 0, hp: state.hp, stamina: state.stamina, settlements: {} };
-  Object.keys(settlements).forEach(function (id) {
-    const s = settlements[id];
-    snap.settlements[id] = { pop: s.pop, food: s.food, wood: s.wood, stone: s.stone, iron: s.iron, steel: s.steel, copper: s.copper, khan: s.khan, mithril: s.mithril || 0, adamantine: s.adamantine || 0 };
-  });
-  return snap;
+  return { state: debugClone(state), settlements: debugClone(settlements) };
 }
 function debugSnapshotRestore() {
   if (!debugSnapshot) return;
-  state.rank = debugSnapshot.rank;
-  state.clock.day = debugSnapshot.day; state.clock.minutes = debugSnapshot.minutes; state.clock.secs = debugSnapshot.secs;
-  state.hp = debugSnapshot.hp; state.stamina = debugSnapshot.stamina;
-  Object.keys(debugSnapshot.settlements).forEach(function (id) {
-    const s = settlements[id]; if (!s) return;
-    const v = debugSnapshot.settlements[id];
-    s.pop = v.pop; s.food = v.food; s.wood = v.wood; s.stone = v.stone; s.iron = v.iron; s.steel = v.steel; s.copper = v.copper; s.khan = v.khan; s.mithril = v.mithril; s.adamantine = v.adamantine;
-  });
+  Object.keys(state).forEach(function (k) { delete state[k]; });
+  Object.assign(state, debugClone(debugSnapshot.state));
+  Object.keys(settlements).forEach(function (k) { delete settlements[k]; });
+  Object.assign(settlements, debugClone(debugSnapshot.settlements));
 }
 function openDebugPrompt() {
   if (debugOpen) { openDebugPanel(); return; }
@@ -2225,7 +2229,7 @@ function openDebugPanel() {
   let setOpts = '';
   Object.keys(settlements).forEach(function (id) { setOpts += '<option value="' + id + '"' + (state.current === id ? ' selected' : '') + '>' + settlements[id].name + '</option>'; });
   const cs = cur();
-  let html = '<div class="notice">Testing only. Autosave and the live clock are paused while this is open. Use Restore my game to put everything back exactly as it was, or Keep changes to keep what you set. (Closing this window with X leaves debug paused — enter the word again to come back.)</div>';
+  let html = '<div class="notice">Testing only. Autosave is paused while this is open (the clock keeps running). Use Restore my game to put everything back exactly as it was, or Keep changes to keep what you set. (Closing this window with X leaves debug paused — enter the word again to come back.)</div>';
   html += '<h3 style="margin:14px 0 4px">Rank</h3><div class="row"><span>Your rank</span><span><select id="debug-rank">' + rankOpts + '</select> <button data-debug-rank="1">Set rank</button></span></div>';
   html += '<h3 style="margin:14px 0 4px">Settlement</h3><div class="row"><span>Settlement</span><span><select id="debug-settlement">' + setOpts + '</select></span></div>';
   html += '<div class="row"><span>Population</span><span><input id="debug-pop" type="number" value="' + cs.pop + '" style="width:100px"> <button data-debug-pop="1">Set population</button></span></div>';
