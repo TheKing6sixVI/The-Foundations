@@ -157,6 +157,21 @@ const ROAMING = {
   frost: { name: 'Frost Wraith', icon: '❄️', areas: ['northreach', 'ironhold'], hp: 75, dmgMin: 6, dmgMax: 13, loot: { stone: 15, khan: 25 } },
   ember: { name: 'Ember Drake', icon: '🐉', areas: ['emberpeak', 'northreach'], hp: 90, dmgMin: 8, dmgMax: 15, loot: { stone: 20, khan: 30 } },
   mire: { name: 'Mire Serpent', icon: '🐍', areas: ['fangmire', 'elderwood'], hp: 80, dmgMin: 7, dmgMax: 14, loot: { food: 20, khan: 25 } },   tide: { name: 'Tide Serpent', icon: '🌊', areas: ['tidehaven', 'fangmire'], hp: 85, dmgMin: 7, dmgMax: 14, loot: { food: 20, khan: 25 } },
+  rusthound: { name: 'Rust Hound', icon: '🐕', areas: ['ravenholt', 'ashen'], hp: 65, dmgMin: 5, dmgMax: 11, loot: { iron: 15, khan: 20 } },
+  scrapgolem: { name: 'Scrap Golem', icon: '🔩', areas: ['ravenholt', 'ashen'], hp: 85, dmgMin: 7, dmgMax: 13, loot: { iron: 20, khan: 25 } },
+  ruinstalker: { name: 'Ruin Stalker', icon: '👁️', areas: ['ravenholt', 'ashen'], hp: 70, dmgMin: 6, dmgMax: 12, loot: { iron: 15, khan: 25 } },
+  bramble: { name: 'Bramble Wolf', icon: '🐾', areas: ['elderwood', 'crystal'], hp: 70, dmgMin: 6, dmgMax: 12, loot: { wood: 25, khan: 20 } },
+  mosstroll: { name: 'Moss Troll', icon: '🧌', areas: ['elderwood', 'fangmire'], hp: 90, dmgMin: 8, dmgMax: 14, loot: { wood: 30, khan: 25 } },
+  slag: { name: 'Slag Beast', icon: '🔥', areas: ['ironhold', 'northreach'], hp: 85, dmgMin: 7, dmgMax: 14, loot: { iron: 20, khan: 30 } },
+  ironboar: { name: 'Iron Boar', icon: '🐗', areas: ['ironhold', 'northreach'], hp: 75, dmgMin: 6, dmgMax: 13, loot: { iron: 20, khan: 25 } },
+  manawisp: { name: 'Mana Wisp', icon: '🔮', areas: ['spires', 'crystal'], hp: 60, dmgMin: 5, dmgMax: 11, loot: { copper: 15, khan: 25 } },
+  arcaneowl: { name: 'Arcane Owl', icon: '🦉', areas: ['spires', 'crystal'], hp: 65, dmgMin: 6, dmgMax: 12, loot: { copper: 20, khan: 20 } },
+  lavahound: { name: 'Lava Hound', icon: '🌋', areas: ['emberpeak', 'northreach'], hp: 80, dmgMin: 7, dmgMax: 14, loot: { stone: 20, khan: 30 } },
+  magmaserp: { name: 'Magma Serpent', icon: '🪨', areas: ['emberpeak', 'northreach'], hp: 85, dmgMin: 7, dmgMax: 13, loot: { stone: 25, khan: 25 } },
+  boglurker: { name: 'Bog Lurker', icon: '🐸', areas: ['fangmire', 'elderwood'], hp: 70, dmgMin: 6, dmgMax: 12, loot: { food: 25, khan: 20 } },
+  swampleech: { name: 'Swamp Leech', icon: '🪲', areas: ['fangmire', 'tidehaven'], hp: 60, dmgMin: 5, dmgMax: 11, loot: { food: 20, khan: 25 } },
+  shorecrab: { name: 'Shore Crab', icon: '🦀', areas: ['tidehaven', 'fangmire'], hp: 65, dmgMin: 5, dmgMax: 11, loot: { food: 20, khan: 20 } },
+  drownedsailor: { name: 'Drowned Sailor', icon: '👻', areas: ['tidehaven', 'fangmire'], hp: 75, dmgMin: 6, dmgMax: 13, loot: { copper: 15, khan: 30 } },
 };
 const WEAPONS = {
   club: { name: 'Club', cost: { wood: 5 }, bonus: 1 },
@@ -275,8 +290,8 @@ const settlements = {
 const order = ['ravenholt', 'elderwood', 'ironhold', 'spires', 'emberpeak', 'fangmire', 'tidehaven'];
 function makeRegionState(r) { return { found: [] }; }
 const state = {
-  current: 'ravenholt', clock: { day: 1, minutes: 480, secs: 0 }, lastSeason: 'Spring', hp: 100, maxHp: 100, stamina: 100, maxStamina: 100, rank: 0, playerRace: 'human', knowledge: 0, raceChosen: false, beaten: false, victoryShown: false, timeMode: 'live', partySize: 5, weapons: {}, partyWeapons: [], alliances: {}, roamingSlain: {}, roamingHp: {}, exploreResult: {}, character: { weapon: '', armor: '', trinket: '' }, armors: {}, inventory: {}, charName: '', charAge: 25, lastSeen: {}, awayNews: {}, ambush: null, tasks: [], actionSlots: 1, nextTaskId: 1,
-  stats: { wood: 0, food: 0, hunts: 0, stone: 0, iron: 0, copper: 0, steel: 0, built: 0, trades: 0, aids: 0, scouts: 0, cleared: 0, heals: 0 },
+  current: 'ravenholt', clock: { day: 1, minutes: 480, secs: 0 }, lastSeason: 'Spring', hp: 100, maxHp: 100, stamina: 100, maxStamina: 100, rank: 0, playerRace: 'human', knowledge: 0, raceChosen: false, beaten: false, victoryShown: false, timeMode: 'live', partySize: 5, weapons: {}, partyWeapons: [], alliances: {}, roamingSlain: {}, dungeonsClearedEver: {}, roamingHp: {}, exploreResult: {}, character: { weapon: '', armor: '', trinket: '' }, armors: {}, inventory: {}, charName: '', charAge: 25, lastSeen: {}, awayNews: {}, ambush: null, tasks: [], actionSlots: 1, nextTaskId: 1,
+  stats: { wood: 0, food: 0, hunts: 0, stone: 0, iron: 0, copper: 0, steel: 0, built: 0, trades: 0, aids: 0, scouts: 0, cleared: 0, heals: 0, woodHome: 0, foodHome: 0, huntsHome: 0, stoneHome: 0, ironHome: 0, copperHome: 0, steelHome: 0, builtHome: 0, healsHome: 0 },
   regions: { crystal: makeRegionState('crystal'), ashen: makeRegionState('ashen'), northreach: makeRegionState('northreach'), ravenholt: makeRegionState('ravenholt'), elderwood: makeRegionState('elderwood'), ironhold: makeRegionState('ironhold'), spires: makeRegionState('spires'), emberpeak: makeRegionState('emberpeak'), fangmire: makeRegionState('fangmire') }
 };
 function cur() { return settlements[state.current]; }
@@ -488,6 +503,17 @@ function onNewDay() {
       event('🛡️ ' + r.icon + ' A ' + r.name + ' attacked ' + st.name + ', but your adventurers drove it off with no losses!');
     }
   });
+  // Dungeon recharge: cleared dungeons stir again after 7 days.
+  let recharged = 0;
+  Object.keys(state.regions || {}).forEach(function (areaId) {
+    const rg = state.regions[areaId];
+    (rg.found || []).forEach(function (d) {
+      if (!d.cleared) return;
+      if (d.clearedDay === undefined) { d.clearedDay = state.clock.day; return; }
+      if (state.clock.day >= d.clearedDay + 7) { d.cleared = false; d.hp = d.maxHp; d.clearedDay = undefined; recharged += 1; }
+    });
+  });
+  if (recharged > 0) event('🏚️ ' + recharged + ' dungeon' + (recharged > 1 ? 's have' : ' has') + ' stirred again and can be cleared anew.');
 }
 function el(id) { return document.getElementById(id); }
 function setText(id, v) { const e = el(id); if (e) e.textContent = v; }
@@ -733,7 +759,7 @@ function completeTask(t) {
   if (!s) return;
   if (t.kind === 'steel') {
     const rate = (state.playerRace === 'korr' ? 4 : 3) + (s.research && s.research.forges ? 1 : 0);
-    s.steel += rate; state.stats.steel += rate;
+    s.steel += rate; state.stats.steel += rate; if (s.race === state.playerRace) state.stats.steelHome = (state.stats.steelHome || 0) + rate;
     event('Smelted ' + rate + ' steel from 5 iron.');
     return;
   }
@@ -741,20 +767,20 @@ function completeTask(t) {
     const animals = [{ name: 'rabbit', food: 8 }, { name: 'deer', food: 12 }, { name: 'boar', food: 15 }];
     const a = animals[rand(0, 2)];
     const amt = a.food + s.jobs.hunter * 2 + (state.playerRace === 'veyari' ? 2 : 0) + (state.playerRace === 'vesk' ? 4 : 0) + (s.research && s.research.tools ? 2 : 0) + (charTrinket() === 'hunter' ? 2 : 0);
-    s.food += amt; state.stats.hunts += 1;
+    s.food += amt; state.stats.hunts += 1; if (s.race === state.playerRace) state.stats.huntsHome = (state.stats.huntsHome || 0) + 1;
     event('Hunted a ' + a.name + ' (+' + amt + ' food).');
     return;
   }
   const amt = gatherAmount(t.kind, s);
-  if (t.kind === 'wood') { s.wood += amt; state.stats.wood += amt; event('Gathered ' + amt + ' wood from the forest.'); }
+  if (t.kind === 'wood') { s.wood += amt; state.stats.wood += amt; if (s.race === state.playerRace) state.stats.woodHome = (state.stats.woodHome || 0) + amt; event('Gathered ' + amt + ' wood from the forest.'); }
   if (t.kind === 'food') {
-    s.food += amt; state.stats.food += amt;
+    s.food += amt; state.stats.food += amt; if (s.race === state.playerRace) state.stats.foodHome = (state.stats.foodHome || 0) + amt;
     if (CROPS[s.crop].stability) s.stability = clamp(s.stability + CROPS[s.crop].stability, 0, 100);
     event('Harvested ' + amt + ' food (' + CROPS[s.crop].name + ').');
   }
-  if (t.kind === 'stone') { s.stone += amt; state.stats.stone += amt; event('Quarried ' + amt + ' stone.'); }
-  if (t.kind === 'iron') { s.iron += amt; state.stats.iron += amt; event('Mined ' + amt + ' iron.'); }
-  if (t.kind === 'copper') { s.copper += amt; state.stats.copper += amt; event('Mined ' + amt + ' copper.'); }
+  if (t.kind === 'stone') { s.stone += amt; state.stats.stone += amt; if (s.race === state.playerRace) state.stats.stoneHome = (state.stats.stoneHome || 0) + amt; event('Quarried ' + amt + ' stone.'); }
+  if (t.kind === 'iron') { s.iron += amt; state.stats.iron += amt; if (s.race === state.playerRace) state.stats.ironHome = (state.stats.ironHome || 0) + amt; event('Mined ' + amt + ' iron.'); }
+  if (t.kind === 'copper') { s.copper += amt; state.stats.copper += amt; if (s.race === state.playerRace) state.stats.copperHome = (state.stats.copperHome || 0) + amt; event('Mined ' + amt + ' copper.'); }
 }
 function cancelTask() {
   if (state.tasks.length === 0) return;
@@ -814,7 +840,7 @@ function build(type) {
   if (!canAfford(s, dc)) { event('Not enough resources to build ' + b.name + '.'); return; }
   Object.keys(dc).forEach(function (k) { s[k] -= dc[k]; });
   s.buildings.push(type);
-  state.stats.built += 1;
+  state.stats.built += 1; if (s.race === state.playerRace) state.stats.builtHome = (state.stats.builtHome || 0) + 1;
   event('Built ' + b.name + (b.cap > 0 ? ' (houses ' + b.cap + ')' : ' (holds ' + (b.prisoners || 0) + ' prisoners)') + '.');
   checkMissions();
   render();
@@ -981,7 +1007,7 @@ function healSick() {
   if (s.food < 10) { event('Not enough food to heal the sick (need 10).'); return; }
   s.food -= 10;
   s.sick = Math.max(0, s.sick - 5);
-  state.stats.heals += 1;
+  state.stats.heals += 1; if (s.race === state.playerRace) state.stats.healsHome = (state.stats.healsHome || 0) + 1;
   event('Healed the sick in ' + s.name + ' (10 food).');
   turnTime(10);
   checkMissions();
@@ -1409,6 +1435,9 @@ function fightDungeon(areaId, dungeonIndex) {
   if (d.hp <= 0) {
     d.hp = 0;
     d.cleared = true;
+    d.clearedDay = state.clock.day;
+    if (!state.dungeonsClearedEver) state.dungeonsClearedEver = {};
+    state.dungeonsClearedEver[areaId + ':' + d.name] = true;
     state.stats.cleared += 1;
     const lucky = state.stats.cleared % 4 === 0;
     const finalLoot = {};
@@ -1547,7 +1576,7 @@ function openExplore(areaId) {
   } else {
     r.found.forEach(function (d, i) {
       if (d.cleared) {
-        html += '<div class="row"><span>✓ ' + d.name + ' — cleared</span><span class="muted">Loot claimed</span></div>';
+        html += '<div class="row"><span>✓ ' + d.name + ' — cleared</span><span class="muted">' + (d.clearedDay !== undefined ? 'Returns Day ' + (d.clearedDay + 7) : 'Loot claimed') + '</span></div>';
       } else {
         html += '<div class="row"><span>' + (d.big ? '👑 ' : '👹 ') + d.name + ' — ' + d.enemy + ' (HP ' + d.hp + '/' + d.maxHp + ')</span><span>Your HP: ' + state.hp + '</span></div>';
         html += '<button class="choice" data-enter-dungeon="' + areaId + '" data-dungeon="' + i + '"><strong>Enter: ' + d.name + '</strong>Choose your path through rooms of chests, mimics, undead, and shrines — then face ' + d.enemy + ' · About ' + (d.big ? 120 : 90) + ' game minutes</button>';
@@ -1864,152 +1893,153 @@ function openZoom() {
 }
 const RANKS = [
   { name: 'Peasant', missions: [
-    { text: 'Gather wood from a forest', done: false, check: function () { return state.stats.wood >= 1; } },
-    { text: 'Harvest food from a farm', done: false, check: function () { return state.stats.food >= 1; } },
-    { text: 'Hunt animals', done: false, check: function () { return state.stats.hunts >= 1; } },
-    { text: 'Gather stone', done: false, check: function () { return state.stats.stone >= 1; } },
-    { text: 'Build a building', done: false, check: function () { return state.stats.built >= 1; } },
+    { text: 'Gather wood in your home settlement', done: false, check: function () { return ((state.stats.woodHome || 0) - ((state.rankBaseline && state.rankBaseline.woodHome) || 0)) >= 1; } },
+    { text: 'Harvest food in your home settlement', done: false, check: function () { return ((state.stats.foodHome || 0) - ((state.rankBaseline && state.rankBaseline.foodHome) || 0)) >= 1; } },
+    { text: 'Hunt animals at home', done: false, check: function () { return ((state.stats.huntsHome || 0) - ((state.rankBaseline && state.rankBaseline.huntsHome) || 0)) >= 1; } },
+    { text: 'Gather stone at home', done: false, check: function () { return ((state.stats.stoneHome || 0) - ((state.rankBaseline && state.rankBaseline.stoneHome) || 0)) >= 1; } },
+    { text: 'Build a building at home', done: false, check: function () { return ((state.stats.builtHome || 0) - ((state.rankBaseline && state.rankBaseline.builtHome) || 0)) >= 1; } },
     { text: 'Reach Day 2', done: false, check: function () { return state.clock.day >= 2; } },
-    { text: 'Store 100 food in one settlement', done: false, check: function () { return anyS(function (s) { return s.food >= 100; }); } },
-    { text: 'Gather 10 iron', done: false, check: function () { return state.stats.iron >= 10; } },
-    { text: 'Reach 30 citizens in one settlement', done: false, check: function () { return anyS(function (s) { return s.pop >= 30; }); } },
+    { text: 'Store 100 food in your home settlement', done: false, check: function () { return homeS(function (s) { return s.food >= 100; }); } },
+    { text: 'Gather 10 iron at home', done: false, check: function () { return ((state.stats.ironHome || 0) - ((state.rankBaseline && state.rankBaseline.ironHome) || 0)) >= 10; } },
+    { text: 'Reach 30 citizens in your home settlement', done: false, check: function () { return homeS(function (s) { return s.pop >= 30; }); } },
     { text: 'Make a trade', done: false, check: function () { return state.stats.trades >= 1; } }
   ]},
   { name: 'Settler', missions: [
-    { text: 'Build 3 buildings', done: false, check: function () { return state.stats.built >= 3; } },
-    { text: 'Gather 20 stone', done: false, check: function () { return state.stats.stone >= 20; } },
+    { text: 'Build 3 buildings at home', done: false, check: function () { return ((state.stats.builtHome || 0) - ((state.rankBaseline && state.rankBaseline.builtHome) || 0)) >= 3; } },
+    { text: 'Gather 20 stone at home', done: false, check: function () { return ((state.stats.stoneHome || 0) - ((state.rankBaseline && state.rankBaseline.stoneHome) || 0)) >= 20; } },
     { text: 'Scout an unexplored region', done: false, check: function () { return state.stats.scouts >= 1; } },
-    { text: 'Assign a hunter', done: false, check: function () { return anyS(function (s) { return s.jobs.hunter >= 1; }); } },
+    { text: 'Assign a hunter at home', done: false, check: function () { return homeS(function (s) { return s.jobs.hunter >= 1; }); } },
     { text: 'Send aid to another settlement', done: false, check: function () { return state.stats.aids >= 1; } },
-    { text: 'Gather 20 wood', done: false, check: function () { return state.stats.wood >= 20; } },
-    { text: 'Store 150 food in one settlement', done: false, check: function () { return anyS(function (s) { return s.food >= 150; }); } },
-    { text: 'Gather 20 iron', done: false, check: function () { return state.stats.iron >= 20; } },
-    { text: 'Reach 50 citizens in one settlement', done: false, check: function () { return anyS(function (s) { return s.pop >= 50; }); } },
-    { text: 'Smelt steel', done: false, check: function () { return state.stats.steel >= 1; } }
+    { text: 'Gather 20 wood at home', done: false, check: function () { return ((state.stats.woodHome || 0) - ((state.rankBaseline && state.rankBaseline.woodHome) || 0)) >= 20; } },
+    { text: 'Store 150 food in your home settlement', done: false, check: function () { return homeS(function (s) { return s.food >= 150; }); } },
+    { text: 'Gather 20 iron at home', done: false, check: function () { return ((state.stats.ironHome || 0) - ((state.rankBaseline && state.rankBaseline.ironHome) || 0)) >= 20; } },
+    { text: 'Reach 50 citizens in your home settlement', done: false, check: function () { return homeS(function (s) { return s.pop >= 50; }); } },
+    { text: 'Smelt steel at home', done: false, check: function () { return ((state.stats.steelHome || 0) - ((state.rankBaseline && state.rankBaseline.steelHome) || 0)) >= 1; } }
   ]},
   { name: 'Villager', missions: [
-    { text: 'Reach 60 housing in one settlement', done: false, check: function () { return anyS(function (s) { return capacity(s) >= 60; }); } },
-    { text: 'Gather 20 copper', done: false, check: function () { return state.stats.copper >= 20; } },
+    { text: 'Reach 60 housing in your home settlement', done: false, check: function () { return homeS(function (s) { return capacity(s) >= 60; }); } },
+    { text: 'Gather 20 copper at home', done: false, check: function () { return ((state.stats.copperHome || 0) - ((state.rankBaseline && state.rankBaseline.copperHome) || 0)) >= 20; } },
     { text: 'Make 3 trades', done: false, check: function () { return state.stats.trades >= 3; } },
-    { text: 'Hunt 5 times', done: false, check: function () { return state.stats.hunts >= 5; } },
-    { text: 'Gather 30 wood', done: false, check: function () { return state.stats.wood >= 30; } },
+    { text: 'Hunt 5 times at home', done: false, check: function () { return ((state.stats.huntsHome || 0) - ((state.rankBaseline && state.rankBaseline.huntsHome) || 0)) >= 5; } },
+    { text: 'Gather 30 wood at home', done: false, check: function () { return ((state.stats.woodHome || 0) - ((state.rankBaseline && state.rankBaseline.woodHome) || 0)) >= 30; } },
     { text: 'Assign 3 workers in total', done: false, check: function () { return totalJobs() >= 3; } },
-    { text: 'Hold 150 khan in one settlement', done: false, check: function () { return anyS(function (s) { return s.khan >= 150; }); } },
-    { text: 'Heal the sick 2 times', done: false, check: function () { return state.stats.heals >= 2; } },
+    { text: 'Hold 150 khan in your home settlement', done: false, check: function () { return homeS(function (s) { return s.khan >= 150; }); } },
+    { text: 'Heal the sick in your home settlement 2 times', done: false, check: function () { return ((state.stats.healsHome || 0) - ((state.rankBaseline && state.rankBaseline.healsHome) || 0)) >= 2; } },
     { text: 'Reach 150 citizens across all settlements', done: false, check: function () { return totalPop() >= 150; } },
     { text: 'Clear a dungeon', done: false, check: function () { return state.stats.cleared >= 1; } }
   ]},
   { name: 'Townsfolk', missions: [
-    { text: 'Build 6 buildings in total', done: false, check: function () { return state.stats.built >= 6; } },
-    { text: 'Gather 30 stone', done: false, check: function () { return state.stats.stone >= 30; } },
-    { text: 'Gather 30 iron', done: false, check: function () { return state.stats.iron >= 30; } },
+    { text: 'Build 6 buildings in total at home', done: false, check: function () { return ((state.stats.builtHome || 0) - ((state.rankBaseline && state.rankBaseline.builtHome) || 0)) >= 6; } },
+    { text: 'Gather 30 stone at home', done: false, check: function () { return ((state.stats.stoneHome || 0) - ((state.rankBaseline && state.rankBaseline.stoneHome) || 0)) >= 30; } },
+    { text: 'Gather 30 iron at home', done: false, check: function () { return ((state.stats.ironHome || 0) - ((state.rankBaseline && state.rankBaseline.ironHome) || 0)) >= 30; } },
     { text: 'Scout 3 regions', done: false, check: function () { return state.stats.scouts >= 3; } },
     { text: 'Send aid 3 times', done: false, check: function () { return state.stats.aids >= 3; } },
-    { text: 'Assign a miner', done: false, check: function () { return anyS(function (s) { return s.jobs.miner >= 1; }); } },
-    { text: 'Hold 250 khan in one settlement', done: false, check: function () { return anyS(function (s) { return s.khan >= 250; }); } },
-    { text: 'Reach 80% stability in one settlement', done: false, check: function () { return anyS(function (s) { return s.stability >= 80; }); } },
+    { text: 'Assign a miner at home', done: false, check: function () { return homeS(function (s) { return s.jobs.miner >= 1; }); } },
+    { text: 'Hold 250 khan in your home settlement', done: false, check: function () { return homeS(function (s) { return s.khan >= 250; }); } },
+    { text: 'Reach 80% stability in your home settlement', done: false, check: function () { return homeS(function (s) { return s.stability >= 80; }); } },
     { text: 'Have 2 settlements with 40+ citizens', done: false, check: function () { return countS(function (s) { return s.pop >= 40; }) >= 2; } },
-    { text: 'Reach 90% stability in one settlement', done: false, check: function () { return anyS(function (s) { return s.stability >= 90; }); } }
+    { text: 'Reach 90% stability in your home settlement', done: false, check: function () { return homeS(function (s) { return s.stability >= 90; }); } }
   ]},
   { name: 'Merchant', missions: [
     { text: 'Make 5 trades', done: false, check: function () { return state.stats.trades >= 5; } },
-    { text: 'Gather 40 stone', done: false, check: function () { return state.stats.stone >= 40; } },
-    { text: 'Gather 40 iron', done: false, check: function () { return state.stats.iron >= 40; } },
-    { text: 'Hunt 10 times', done: false, check: function () { return state.stats.hunts >= 10; } },
-    { text: 'Heal the sick 3 times', done: false, check: function () { return state.stats.heals >= 3; } },
+    { text: 'Gather 40 stone at home', done: false, check: function () { return ((state.stats.stoneHome || 0) - ((state.rankBaseline && state.rankBaseline.stoneHome) || 0)) >= 40; } },
+    { text: 'Gather 40 iron at home', done: false, check: function () { return ((state.stats.ironHome || 0) - ((state.rankBaseline && state.rankBaseline.ironHome) || 0)) >= 40; } },
+    { text: 'Hunt 10 times at home', done: false, check: function () { return ((state.stats.huntsHome || 0) - ((state.rankBaseline && state.rankBaseline.huntsHome) || 0)) >= 10; } },
+    { text: 'Heal the sick in your home settlement 3 times', done: false, check: function () { return ((state.stats.healsHome || 0) - ((state.rankBaseline && state.rankBaseline.healsHome) || 0)) >= 3; } },
     { text: 'Assign 5 workers in total', done: false, check: function () { return totalJobs() >= 5; } },
-    { text: 'Build 10 buildings in total', done: false, check: function () { return state.stats.built >= 10; } },
+    { text: 'Build 10 buildings in total at home', done: false, check: function () { return ((state.stats.builtHome || 0) - ((state.rankBaseline && state.rankBaseline.builtHome) || 0)) >= 10; } },
     { text: 'Form an alliance', done: false, check: function () { return Object.keys(state.alliances).some(function (id) { return state.alliances[id]; }); } },
     { text: 'Clear 2 dungeons', done: false, check: function () { return state.stats.cleared >= 2; } },
-    { text: 'Hold 400 khan in one settlement', done: false, check: function () { return anyS(function (s) { return s.khan >= 400; }); } }
+    { text: 'Hold 400 khan in your home settlement', done: false, check: function () { return homeS(function (s) { return s.khan >= 400; }); } }
   ]},
   { name: 'Knight', missions: [
-    { text: 'Gather 50 wood', done: false, check: function () { return state.stats.wood >= 50; } },
-    { text: 'Gather 50 copper', done: false, check: function () { return state.stats.copper >= 50; } },
+    { text: 'Gather 50 wood at home', done: false, check: function () { return ((state.stats.woodHome || 0) - ((state.rankBaseline && state.rankBaseline.woodHome) || 0)) >= 50; } },
+    { text: 'Gather 50 copper at home', done: false, check: function () { return ((state.stats.copperHome || 0) - ((state.rankBaseline && state.rankBaseline.copperHome) || 0)) >= 50; } },
     { text: 'Scout 5 regions', done: false, check: function () { return state.stats.scouts >= 5; } },
     { text: 'Send aid 5 times', done: false, check: function () { return state.stats.aids >= 5; } },
-    { text: 'Assign a scholar', done: false, check: function () { return anyS(function (s) { return s.jobs.scholar >= 1; }); } },
+    { text: 'Assign a scholar at home', done: false, check: function () { return homeS(function (s) { return s.jobs.scholar >= 1; }); } },
     { text: 'Craft a weapon', done: false, check: function () { return Object.keys(state.weapons || {}).length >= 1; } },
     { text: 'Keep crime below 15 in every settlement', done: false, check: function () { return order.every(function (id) { return settlements[id].crime <= 15; }); } },
-    { text: 'Reach 70 citizens in one settlement', done: false, check: function () { return anyS(function (s) { return s.pop >= 70; }); } },
+    { text: 'Reach 70 citizens in your home settlement', done: false, check: function () { return homeS(function (s) { return s.pop >= 70; }); } },
     { text: 'Clear 5 dungeons', done: false, check: function () { return state.stats.cleared >= 5; } },
     { text: 'Reach Day 30', done: false, check: function () { return state.clock.day >= 30; } }
   ]},
   { name: 'Lord', missions: [
-    { text: 'Build 15 buildings in total', done: false, check: function () { return state.stats.built >= 15; } },
-    { text: 'Gather 60 iron', done: false, check: function () { return state.stats.iron >= 60; } },
+    { text: 'Build 15 buildings in total at home', done: false, check: function () { return ((state.stats.builtHome || 0) - ((state.rankBaseline && state.rankBaseline.builtHome) || 0)) >= 15; } },
+    { text: 'Gather 60 iron at home', done: false, check: function () { return ((state.stats.ironHome || 0) - ((state.rankBaseline && state.rankBaseline.ironHome) || 0)) >= 60; } },
     { text: 'Make 10 trades', done: false, check: function () { return state.stats.trades >= 10; } },
-    { text: 'Hunt 15 times', done: false, check: function () { return state.stats.hunts >= 15; } },
+    { text: 'Hunt 15 times at home', done: false, check: function () { return ((state.stats.huntsHome || 0) - ((state.rankBaseline && state.rankBaseline.huntsHome) || 0)) >= 15; } },
     { text: 'Assign 10 workers in total', done: false, check: function () { return totalJobs() >= 10; } },
-    { text: 'Research a technology', done: false, check: function () { return order.some(function (id) { return Object.keys(settlements[id].research || {}).length >= 1; }); } },
-    { text: 'Reach 80 housing in one settlement', done: false, check: function () { return anyS(function (s) { return capacity(s) >= 80; }); } },
+    { text: 'Research a technology at home', done: false, check: function () { return homeS(function (s) { return Object.keys(s.research || {}).length >= 1; }); } },
+    { text: 'Reach 80 housing in your home settlement', done: false, check: function () { return homeS(function (s) { return capacity(s) >= 80; }); } },
     { text: 'Have 3 settlements with 50+ citizens', done: false, check: function () { return countS(function (s) { return s.pop >= 50; }) >= 3; } },
-    { text: 'Find mithril', done: false, check: function () { return anyS(function (s) { return (s.mithril || 0) >= 1; }); } },
+    { text: 'Find mithril at home', done: false, check: function () { return homeS(function (s) { return (s.mithril || 0) >= 1; }); } },
     { text: 'Reach 200 citizens across all settlements', done: false, check: function () { return totalPop() >= 200; } }
   ]},
   { name: 'King', missions: [
-    { text: 'Gather 100 wood', done: false, check: function () { return state.stats.wood >= 100; } },
-    { text: 'Gather 100 stone', done: false, check: function () { return state.stats.stone >= 100; } },
+    { text: 'Gather 100 wood at home', done: false, check: function () { return ((state.stats.woodHome || 0) - ((state.rankBaseline && state.rankBaseline.woodHome) || 0)) >= 100; } },
+    { text: 'Gather 100 stone at home', done: false, check: function () { return ((state.stats.stoneHome || 0) - ((state.rankBaseline && state.rankBaseline.stoneHome) || 0)) >= 100; } },
     { text: 'Make 15 trades', done: false, check: function () { return state.stats.trades >= 15; } },
-    { text: 'Heal the sick 5 times', done: false, check: function () { return state.stats.heals >= 5; } },
-    { text: 'Assign a woodcutter', done: false, check: function () { return anyS(function (s) { return s.jobs.woodcutter >= 1; }); } },
+    { text: 'Heal the sick in your home settlement 5 times', done: false, check: function () { return ((state.stats.healsHome || 0) - ((state.rankBaseline && state.rankBaseline.healsHome) || 0)) >= 5; } },
+    { text: 'Assign a woodcutter at home', done: false, check: function () { return homeS(function (s) { return s.jobs.woodcutter >= 1; }); } },
     { text: 'Craft armor', done: false, check: function () { return Object.keys(state.armors || {}).length >= 1; } },
-    { text: 'Hold 600 khan in one settlement', done: false, check: function () { return anyS(function (s) { return s.khan >= 600; }); } },
-    { text: 'Set a children study focus', done: false, check: function () { return anyS(function (s) { return s.focus !== ''; }); } },
+    { text: 'Hold 600 khan in your home settlement', done: false, check: function () { return homeS(function (s) { return s.khan >= 600; }); } },
+    { text: 'Set a children study focus at home', done: false, check: function () { return homeS(function (s) { return s.focus !== ''; }); } },
     { text: 'Clear 10 dungeons', done: false, check: function () { return state.stats.cleared >= 10; } },
     { text: 'Reach Day 60', done: false, check: function () { return state.clock.day >= 60; } }
   ]},
   { name: 'High King', missions: [
-    { text: 'Gather 150 wood', done: false, check: function () { return state.stats.wood >= 150; } },
-    { text: 'Gather 150 stone', done: false, check: function () { return state.stats.stone >= 150; } },
+    { text: 'Gather 150 wood at home', done: false, check: function () { return ((state.stats.woodHome || 0) - ((state.rankBaseline && state.rankBaseline.woodHome) || 0)) >= 150; } },
+    { text: 'Gather 150 stone at home', done: false, check: function () { return ((state.stats.stoneHome || 0) - ((state.rankBaseline && state.rankBaseline.stoneHome) || 0)) >= 150; } },
     { text: 'Make 20 trades', done: false, check: function () { return state.stats.trades >= 20; } },
-    { text: 'Heal the sick 8 times', done: false, check: function () { return state.stats.heals >= 8; } },
+    { text: 'Heal the sick in your home settlement 8 times', done: false, check: function () { return ((state.stats.healsHome || 0) - ((state.rankBaseline && state.rankBaseline.healsHome) || 0)) >= 8; } },
     { text: 'Scout 8 regions', done: false, check: function () { return state.stats.scouts >= 8; } },
     { text: 'Send aid 8 times', done: false, check: function () { return state.stats.aids >= 8; } },
-    { text: 'Hold 800 khan in one settlement', done: false, check: function () { return anyS(function (s) { return s.khan >= 800; }); } },
+    { text: 'Hold 800 khan in your home settlement', done: false, check: function () { return homeS(function (s) { return s.khan >= 800; }); } },
     { text: 'Reach 250 citizens across all settlements', done: false, check: function () { return totalPop() >= 250; } },
     { text: 'Clear 15 dungeons', done: false, check: function () { return state.stats.cleared >= 15; } },
     { text: 'Reach Day 90', done: false, check: function () { return state.clock.day >= 90; } }
   ]},
   { name: 'Emperor', missions: [
-    { text: 'Gather 100 iron', done: false, check: function () { return state.stats.iron >= 100; } },
-    { text: 'Gather 100 copper', done: false, check: function () { return state.stats.copper >= 100; } },
-    { text: 'Hunt 20 times', done: false, check: function () { return state.stats.hunts >= 20; } },
-    { text: 'Build 20 buildings in total', done: false, check: function () { return state.stats.built >= 20; } },
+    { text: 'Gather 100 iron at home', done: false, check: function () { return ((state.stats.ironHome || 0) - ((state.rankBaseline && state.rankBaseline.ironHome) || 0)) >= 100; } },
+    { text: 'Gather 100 copper at home', done: false, check: function () { return ((state.stats.copperHome || 0) - ((state.rankBaseline && state.rankBaseline.copperHome) || 0)) >= 100; } },
+    { text: 'Hunt 20 times at home', done: false, check: function () { return ((state.stats.huntsHome || 0) - ((state.rankBaseline && state.rankBaseline.huntsHome) || 0)) >= 20; } },
+    { text: 'Build 20 buildings in total at home', done: false, check: function () { return ((state.stats.builtHome || 0) - ((state.rankBaseline && state.rankBaseline.builtHome) || 0)) >= 20; } },
     { text: 'Assign 15 workers in total', done: false, check: function () { return totalJobs() >= 15; } },
-    { text: 'Research 3 technologies in one settlement', done: false, check: function () { return order.some(function (id) { return Object.keys(settlements[id].research || {}).length >= 3; }); } },
-    { text: 'Hold 1000 khan in one settlement', done: false, check: function () { return anyS(function (s) { return s.khan >= 1000; }); } },
+    { text: 'Research 3 technologies in your home settlement', done: false, check: function () { return homeS(function (s) { return Object.keys(s.research || {}).length >= 3; }); } },
+    { text: 'Hold 1000 khan in your home settlement', done: false, check: function () { return homeS(function (s) { return s.khan >= 1000; }); } },
     { text: 'Have 4 settlements with 50+ citizens', done: false, check: function () { return countS(function (s) { return s.pop >= 50; }) >= 4; } },
     { text: 'Clear 20 dungeons', done: false, check: function () { return state.stats.cleared >= 20; } },
     { text: 'Reach Day 120', done: false, check: function () { return state.clock.day >= 120; } }
   ]},
   { name: 'Grand Emperor', missions: [
-    { text: 'Gather 200 wood', done: false, check: function () { return state.stats.wood >= 200; } },
-    { text: 'Gather 200 stone', done: false, check: function () { return state.stats.stone >= 200; } },
+    { text: 'Gather 200 wood at home', done: false, check: function () { return ((state.stats.woodHome || 0) - ((state.rankBaseline && state.rankBaseline.woodHome) || 0)) >= 200; } },
+    { text: 'Gather 200 stone at home', done: false, check: function () { return ((state.stats.stoneHome || 0) - ((state.rankBaseline && state.rankBaseline.stoneHome) || 0)) >= 200; } },
     { text: 'Make 25 trades', done: false, check: function () { return state.stats.trades >= 25; } },
-    { text: 'Heal the sick 10 times', done: false, check: function () { return state.stats.heals >= 10; } },
-    { text: 'Find 5 mithril in one settlement', done: false, check: function () { return anyS(function (s) { return (s.mithril || 0) >= 5; }); } },
-    { text: 'Find adamantine', done: false, check: function () { return anyS(function (s) { return (s.adamantine || 0) >= 1; }); } },
-    { text: 'Hold 1500 khan in one settlement', done: false, check: function () { return anyS(function (s) { return s.khan >= 1500; }); } },
+    { text: 'Heal the sick in your home settlement 10 times', done: false, check: function () { return ((state.stats.healsHome || 0) - ((state.rankBaseline && state.rankBaseline.healsHome) || 0)) >= 10; } },
+    { text: 'Find 5 mithril in your home settlement', done: false, check: function () { return homeS(function (s) { return (s.mithril || 0) >= 5; }); } },
+    { text: 'Find adamantine at home', done: false, check: function () { return homeS(function (s) { return (s.adamantine || 0) >= 1; }); } },
+    { text: 'Hold 1500 khan in your home settlement', done: false, check: function () { return homeS(function (s) { return s.khan >= 1500; }); } },
     { text: 'Reach 350 citizens across all settlements', done: false, check: function () { return totalPop() >= 350; } },
     { text: 'Clear 30 dungeons', done: false, check: function () { return state.stats.cleared >= 30; } },
     { text: 'Reach Day 150', done: false, check: function () { return state.clock.day >= 150; } }
   ]},
   { name: 'Eternal King', missions: [
-    { text: 'Gather 150 iron', done: false, check: function () { return state.stats.iron >= 150; } },
-    { text: 'Gather 150 copper', done: false, check: function () { return state.stats.copper >= 150; } },
-    { text: 'Hunt 25 times', done: false, check: function () { return state.stats.hunts >= 25; } },
-    { text: 'Build 25 buildings in total', done: false, check: function () { return state.stats.built >= 25; } },
+    { text: 'Gather 150 iron at home', done: false, check: function () { return ((state.stats.ironHome || 0) - ((state.rankBaseline && state.rankBaseline.ironHome) || 0)) >= 150; } },
+    { text: 'Gather 150 copper at home', done: false, check: function () { return ((state.stats.copperHome || 0) - ((state.rankBaseline && state.rankBaseline.copperHome) || 0)) >= 150; } },
+    { text: 'Hunt 25 times at home', done: false, check: function () { return ((state.stats.huntsHome || 0) - ((state.rankBaseline && state.rankBaseline.huntsHome) || 0)) >= 25; } },
+    { text: 'Build 25 buildings in total at home', done: false, check: function () { return ((state.stats.builtHome || 0) - ((state.rankBaseline && state.rankBaseline.builtHome) || 0)) >= 25; } },
     { text: 'Assign 20 workers in total', done: false, check: function () { return totalJobs() >= 20; } },
-    { text: 'Research all 6 technologies in one settlement', done: false, check: function () { return order.some(function (id) { return Object.keys(settlements[id].research || {}).length >= 6; }); } },
-    { text: 'Hold 2000 khan in one settlement', done: false, check: function () { return anyS(function (s) { return s.khan >= 2000; }); } },
+    { text: 'Research all 6 technologies in your home settlement', done: false, check: function () { return homeS(function (s) { return Object.keys(s.research || {}).length >= 6; }); } },
+    { text: 'Hold 2000 khan in your home settlement', done: false, check: function () { return homeS(function (s) { return s.khan >= 2000; }); } },
     { text: 'Have 5 settlements with 50+ citizens', done: false, check: function () { return countS(function (s) { return s.pop >= 50; }) >= 5; } },
-    { text: 'Clear every dungeon', done: false, check: function () { return state.stats.cleared >= totalDungeons(); } },
+    { text: 'Clear every dungeon', done: false, check: function () { return Object.keys(state.dungeonsClearedEver || {}).length >= totalDungeons(); } },
     { text: 'Reach Day 180', done: false, check: function () { return state.clock.day >= 180; } }
   ]}
 ];
 const FINAL_RANK = 'King of the World';
-function anyS(fn) { return order.some(function (id) { return fn(settlements[id]); }); }
+function homeSettlement() { const id = order.find(function (i) { return settlements[i].race === state.playerRace; }); return id ? settlements[id] : null; }
+function homeS(fn) { const h = homeSettlement(); return h ? fn(h) : false; }
 function countS(fn) { return order.reduce(function (n, id) { return fn(settlements[id]) ? n + 1 : n; }, 0); }
 function totalPop() { return order.reduce(function (n, id) { return n + settlements[id].pop; }, 0); }
 function totalJobs() { return order.reduce(function (n, id) { return n + sumJobs(settlements[id]); }, 0); }
@@ -2021,6 +2051,7 @@ function checkMissions() {
     rank.missions.forEach(function (m) { if (!m.done && m.check()) m.done = true; if (!m.done) allDone = false; });
     if (!allDone) break;
     state.rank += 1;
+    state.rankBaseline = Object.assign({}, state.stats);
     event(state.rank >= RANKS.length ? 'You are now the ' + FINAL_RANK + '! Every settlement bows to you.' : 'You have risen to ' + RANKS[state.rank].name + '!');
       if (state.rank >= RANKS.length) { state.beaten = true; if (!state.victoryShown) { state.victoryShown = true; setTimeout(openVictory, 50); } }
   }
@@ -2175,6 +2206,7 @@ function loadGame() {
       });
     }
     state.raceChosen = true;
+    if (!state.dungeonsClearedEver) { state.dungeonsClearedEver = {}; Object.keys(state.regions || {}).forEach(function (areaId) { ((state.regions[areaId] || {}).found || []).forEach(function (d) { if (d.cleared) state.dungeonsClearedEver[areaId + ':' + d.name] = true; }); }); }
     if (!state.timeMode) state.timeMode = 'live';
     state.tasks = state.tasks || [];
     checkMissions();
@@ -2355,7 +2387,7 @@ const RACE_BENEFIT = {
   vesk: 'Benefit: hunts +4 food.', nerida: 'Benefit: farms +4 food.'
 };
 function sellPrice(k) { return SELL[k] + (state.playerRace === 'human' ? 2 : 0) + (cur().research && cur().research.networks ? 1 : 0) + (hasRacePerk('thalen') ? 2 : 0); }
-function buyPrice(k) { return BUY[k] - (state.playerRace === 'human' ? 2 : 0) - (cur().research && cur().research.networks ? 1 : 0) - (hasRacePerk('thalen') ? 2 : 0); }
+function buyPrice(k) { const b = BUY[k] - (state.playerRace === 'human' ? 2 : 0) - (cur().research && cur().research.networks ? 1 : 0) - (hasRacePerk('thalen') ? 2 : 0); const s = sellPrice(k); return b > s ? b : s + 1; }
 function renameCharacter() {
   const input = el('char-name-input');
   const v = input ? input.value.trim() : '';
