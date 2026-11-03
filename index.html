@@ -2647,7 +2647,7 @@ function rest() {
 }
 const SAVE_KEY = 'foundations-save-0-9-1';
 const SAVE_VERSION = '0.9.9';
-const FIREBASE_CONFIG = { apiKey: 'PASTE_YOUR_FIREBASE_API_KEY_HERE', authDomain: 'PASTE_YOUR_PROJECT_ID.firebaseapp.com', projectId: 'PASTE_YOUR_PROJECT_ID', storageBucket: 'PASTE_YOUR_PROJECT_ID.appspot.com', messagingSenderId: 'PASTE_YOUR_SENDER_ID', appId: 'PASTE_YOUR_APP_ID' };
+const FIREBASE_CONFIG = { apiKey: 'AIzaSyDLR-xSCUjyBipFFx-kv44dRCN_aa5N0a0', authDomain: 'the-foundations-842b5.firebaseapp.com', projectId: 'the-foundations-842b5', storageBucket: 'the-foundations-842b5.firebasestorage.app', messagingSenderId: '930130674325', appId: '1:930130674325:web:909d9145b27a171d0c119c' };
 let cloudUser = null; let cloudDb = null; let cloudAuth = null; let cloudSdkPromise = null; let cloudPending = null;
 function cloudConfigReady() { return !!FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey.indexOf('PASTE_') !== 0 && !!FIREBASE_CONFIG.projectId && FIREBASE_CONFIG.projectId.indexOf('PASTE_') !== 0; }
 function cloudSaveSummary(raw) { try { const d = JSON.parse(raw); const st = d.state || {}; const rankName = (typeof RANKS !== 'undefined' && RANKS[st.rank] && RANKS[st.rank].name) ? RANKS[st.rank].name : ('Rank ' + st.rank); return (st.charName || 'Unnamed') + ' · ' + (st.playerRace || '?') + ' · ' + rankName + ' · Day ' + ((st.clock && st.clock.day) || 1); } catch (e) { return 'A saved game'; } }
